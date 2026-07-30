@@ -1,0 +1,2496 @@
+<title>EmirePay — More Section: Product & Engineering Spec</title>
+<style>
+  :root{
+    --paper:#F7F5EE; --ink:#1B241E; --ink-soft:#4B5750;
+    --accent:#1E7A4E; --accent-deep:#123F27; --accent-soft:#E3EEE5;
+    --line:#DCD7C7; --surface:#FFFFFF; --surface-2:#F0EEE3;
+    --warn:#9C6420; --warn-soft:#F3E7D4;
+    --danger:#A63A2D; --danger-soft:#F5E2DD;
+    --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    --sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+    color-scheme: light dark;
+  }
+  :root[data-theme="dark"]{
+    --paper:#10140F; --ink:#E8E6DC; --ink-soft:#A7AE9E;
+    --accent:#54C589; --accent-deep:#0F2C1B; --accent-soft:#173424;
+    --line:#2B3227; --surface:#161B14; --surface-2:#1B2118;
+    --warn:#D9A24B; --warn-soft:#2E2517;
+    --danger:#E08272; --danger-soft:#33201C;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#10140F; --ink:#E8E6DC; --ink-soft:#A7AE9E;
+      --accent:#54C589; --accent-deep:#0F2C1B; --accent-soft:#173424;
+      --line:#2B3227; --surface:#161B14; --surface-2:#1B2118;
+      --warn:#D9A24B; --warn-soft:#2E2517;
+      --danger:#E08272; --danger-soft:#33201C;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.55;}
+  ::selection{background:var(--accent-soft);color:var(--accent-deep);}
+  a{color:var(--accent-deep);}
+  :root[data-theme="dark"] a, @media (prefers-color-scheme: dark){a{color:var(--accent);}}
+  h1,h2,h3,h4,h5{font-family:var(--sans);color:var(--ink);text-wrap:balance;margin:0 0 .4em;}
+  .layout{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh;}
+  /* ---- sidebar ---- */
+  .toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;background:var(--surface-2);border-right:1px solid var(--line);padding:28px 20px 60px;}
+  .toc .brand{font-family:var(--sans);font-weight:700;font-size:15px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+  .brand .dot{width:9px;height:9px;border-radius:2px;background:var(--accent);display:inline-block;}
+  .toc .sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:22px;font-family:var(--sans);}
+  .toc nav ol{list-style:none;margin:0;padding:0;counter-reset:mod;}
+  .toc nav li{counter-increment:mod;margin-bottom:2px;}
+  .toc nav a{display:flex;gap:9px;align-items:baseline;font-family:var(--sans);font-size:13px;color:var(--ink-soft);text-decoration:none;padding:6px 8px;border-radius:5px;}
+  .toc nav a:hover{background:var(--accent-soft);color:var(--accent-deep);}
+  .toc nav a::before{content:counter(mod,decimal-leading-zero);font-family:var(--mono);font-size:11px;color:var(--accent);opacity:.75;}
+  .toc .grp-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--ink-soft);opacity:.7;margin:20px 0 6px 8px;font-family:var(--sans);}
+  /* ---- main ---- */
+  main{padding:56px 64px 120px;max-width:920px;}
+  .cover h1{font-size:35px;letter-spacing:-.01em;}
+  .cover .eyebrow{font-family:var(--sans);text-transform:uppercase;letter-spacing:.14em;font-size:11.5px;color:var(--accent-deep);background:var(--accent-soft);display:inline-block;padding:4px 10px;border-radius:3px;margin-bottom:14px;}
+  .cover .dek{font-size:17px;color:var(--ink-soft);max-width:62ch;}
+  .meta-row{display:flex;gap:28px;flex-wrap:wrap;margin-top:28px;padding-top:20px;border-top:1px solid var(--line);font-family:var(--sans);font-size:12.5px;}
+  .meta-row div span{display:block;color:var(--ink-soft);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+  section.mod{margin-top:76px;scroll-margin-top:24px;}
+  .mod-head{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:8px;}
+  .mod-num{font-family:var(--mono);font-size:14px;color:var(--accent);}
+  .mod-head h2{font-size:26px;margin:0;}
+  .mod-intro{color:var(--ink-soft);max-width:70ch;margin:10px 0 30px;}
+  article.screen{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:0;margin:0 0 34px;overflow:hidden;scroll-margin-top:24px;}
+  .screen-head{padding:18px 24px;background:var(--accent-soft);border-bottom:1px solid var(--line);}
+  .screen-head .tag{font-family:var(--sans);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-deep);}
+  .screen-head h3{font-size:19px;margin:2px 0 4px;}
+  .screen-head .dek{font-family:var(--sans);font-size:13.5px;color:var(--ink-soft);margin:0;}
+  .field-grid{padding:6px 24px 20px;}
+  .field{padding:16px 0;border-bottom:1px solid var(--line);}
+  .field:last-child{border-bottom:none;}
+  .field h4{font-family:var(--sans);font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--accent-deep);margin-bottom:8px;}
+  .field p{margin:0 0 8px;font-size:14.5px;}
+  .field ul, .field ol{margin:0 0 8px;padding-left:20px;font-size:14.5px;}
+  .field li{margin-bottom:4px;}
+  .field-2col{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media (max-width:760px){.field-2col{grid-template-columns:1fr;}}
+  table.spec{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:12.8px;margin:4px 0 6px;}
+  table.spec th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);border-bottom:1px solid var(--line);padding:6px 10px 6px 0;}
+  table.spec td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line);vertical-align:top;}
+  table.spec tr:last-child td{border-bottom:none;}
+  table.spec code, .field code, td code{font-family:var(--mono);background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:12px;}
+  .pill{display:inline-block;font-family:var(--sans);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.02em;}
+  .pill.ok{background:var(--accent-soft);color:var(--accent-deep);}
+  .pill.warn{background:var(--warn-soft);color:var(--warn);}
+  .pill.danger{background:var(--danger-soft);color:var(--danger);}
+  pre.receipt{position:relative;font-family:var(--mono);font-size:12px;line-height:1.5;background:var(--surface-2);border:1px dashed var(--line);border-radius:2px;padding:16px 18px;white-space:pre;overflow-x:auto;margin:4px 0 10px;}
+  pre.receipt::before{content:"";position:absolute;top:-6px;left:0;right:0;height:6px;background:
+    linear-gradient(135deg, var(--paper) 50%, transparent 50%) 0 0/10px 10px repeat-x,
+    linear-gradient(-135deg, var(--paper) 50%, transparent 50%) 0 0/10px 10px repeat-x;}
+  pre.receipt::after{content:"";position:absolute;bottom:-6px;left:0;right:0;height:6px;background:
+    linear-gradient(45deg, var(--paper) 50%, transparent 50%) 0 0/10px 10px repeat-x,
+    linear-gradient(-45deg, var(--paper) 50%, transparent 50%) 0 0/10px 10px repeat-x;}
+  .note{font-family:var(--sans);font-size:13px;background:var(--warn-soft);color:var(--warn);border-left:3px solid var(--warn);padding:10px 14px;border-radius:0 4px 4px 0;margin:6px 0;}
+  .sec-note{font-family:var(--sans);font-size:13px;background:var(--danger-soft);color:var(--danger);border-left:3px solid var(--danger);padding:10px 14px;border-radius:0 4px 4px 0;margin:6px 0;}
+  hr.rule{border:none;border-top:1px solid var(--line);margin:60px 0;}
+  .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px;}
+  .chip{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);border:1px solid var(--line);padding:2px 8px;border-radius:4px;}
+  footer.doc-end{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--sans);font-size:12px;color:var(--ink-soft);}
+</style>
+
+<div class="layout">
+  <aside class="toc">
+    <div class="brand"><span class="dot"></span>EmirePay</div>
+    <div class="sub">More Section — Spec v1.0</div>
+    <nav>
+      <div class="grp-title">Start</div>
+      <ol style="counter-reset:mod 0;">
+        <li><a href="#overview">Overview &amp; IA</a></li>
+      </ol>
+      <div class="grp-title">Account</div>
+      <ol style="counter-reset:mod 0;">
+        <li><a href="#profile">Profile</a></li>
+        <li><a href="#security">Security &amp; PIN</a></li>
+        <li><a href="#cards">Cards &amp; Banks</a></li>
+      </ol>
+      <div class="grp-title">Preferences</div>
+      <ol style="counter-reset:mod 3;">
+        <li><a href="#notifications">Notifications</a></li>
+        <li><a href="#biometric">Biometric Login</a></li>
+        <li><a href="#theme">Appearance</a></li>
+      </ol>
+      <div class="grp-title">Support</div>
+      <ol style="counter-reset:mod 6;">
+        <li><a href="#help">Help Center</a></li>
+        <li><a href="#refer">Refer &amp; Earn</a></li>
+        <li><a href="#rate">Rate the App</a></li>
+        <li><a href="#about">About</a></li>
+      </ol>
+      <div class="grp-title">Session</div>
+      <ol style="counter-reset:mod 10;">
+        <li><a href="#logout">Logout</a></li>
+      </ol>
+      <div class="grp-title">Cross-Cutting</div>
+      <ol style="counter-reset:mod 11;">
+        <li><a href="#crosscutting">Architecture, APIs, QA &amp; PRD</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="cover">
+      <span class="eyebrow">Internal Spec · Not for distribution</span>
+      <h1>The More Section</h1>
+      <p class="dek">A complete, build-ready specification for every screen behind EmirePay's <strong>More</strong> tab — account, security, cards, preferences, and support — covering flows, validation, APIs, data model, states, and security posture for design, engineering, and QA.</p>
+      <div class="meta-row">
+        <div><span>Product</span>EmirePay Mobile (Flutter)</div>
+        <div><span>Module</span>More / Account Settings</div>
+        <div><span>Author</span>Product &amp; Design</div>
+        <div><span>Version</span>1.0 — Draft for build</div>
+        <div><span>Status</span><span class="pill warn">In review</span></div>
+      </div>
+    </div>
+
+    <section class="mod" id="overview">
+      <div class="mod-head"><span class="mod-num">00</span><h2>Overview &amp; Information Architecture</h2></div>
+      <p class="mod-intro">The current build (see <code>lib/screens/more/more_screen.dart</code>) ships a static, UI-only version of this menu: identity header, three grouped lists, and a logout row. This spec turns each row into a fully specified product surface — the destination screen(s), the data contract, and the operational concerns (audit, fraud, notifications) a fintech regulator and a support desk will both ask about on day one.</p>
+
+      <div class="field-2col">
+        <div class="field">
+          <h4>Menu → Screen Map</h4>
+          <table class="spec">
+            <tr><th>Group</th><th>Row</th><th>Destination</th></tr>
+            <tr><td>Identity</td><td>Avatar / name card</td><td>Profile Overview</td></tr>
+            <tr><td>Account</td><td>Profile</td><td>Profile Overview</td></tr>
+            <tr><td>Account</td><td>Security &amp; PIN</td><td>Security Hub</td></tr>
+            <tr><td>Account</td><td>Cards &amp; Banks</td><td>Cards &amp; Banks Hub</td></tr>
+            <tr><td>Preferences</td><td>Notifications</td><td>Notification Settings</td></tr>
+            <tr><td>Preferences</td><td>Biometric Login</td><td>Biometric Enrollment</td></tr>
+            <tr><td>Preferences</td><td>Light appearance</td><td>Theme (in-place toggle)</td></tr>
+            <tr><td>Support</td><td>Help Center</td><td>Help Center Hub</td></tr>
+            <tr><td>Support</td><td>Refer &amp; Earn</td><td>Referral Dashboard</td></tr>
+            <tr><td>Support</td><td>Rate the App</td><td>Rate the App sheet</td></tr>
+            <tr><td>Support</td><td>About</td><td>About screen</td></tr>
+            <tr><td>Session</td><td>Log Out</td><td>Logout confirm sheet</td></tr>
+          </table>
+        </div>
+        <div class="field">
+          <h4>Design Tokens Referenced Throughout</h4>
+          <ul>
+            <li><code>account.kycLevel</code> drives every gated action (limits, card issuance, referral payout).</li>
+            <li>All destructive/irreversible actions (remove bank, delete card, logout-all) require <strong>PIN or biometric step-up</strong>, not just a confirm dialog.</li>
+            <li>Every write endpoint below returns a standard envelope: <code>{status, code, message, data}</code> and every mutating call is idempotent via <code>Idempotency-Key</code> header.</li>
+            <li>All screens ship a skeleton-loader state, not a spinner, for list/detail views &gt; 300ms.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="mod" id="profile">
+      <div class="mod-head"><span class="mod-num">01</span><h2>Profile</h2></div>
+      <p class="mod-intro">Profile is the identity record underpinning KYC tier, transaction limits, and dispute resolution. It is read-heavy (users check their account number and KYC level constantly) and low-frequency-write (edits are rare, verification is one-time per channel). Split into four screens so the identity edit surface — the one with regulatory weight — isn't buried inside a settings list.</p>
+
+      <article class="screen" id="profile-overview">
+        <div class="screen-head">
+          <span class="tag">Account · Profile</span>
+          <h3>Profile Overview</h3>
+          <p class="dek">Read-only summary of who the account belongs to, its verification tier, and system identifiers.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Give the user one place to confirm their identity is correctly on file and to see, at a glance, how "verified" their account is — because KYC level directly gates how much money they can move.</p>
+          </div>
+          <div class="field">
+            <h4>User Story</h4>
+            <p>As a user, I want to see my full profile, verification status, and account identifiers, so I know what I'm allowed to do on this account and where to look up my account number for a bank transfer.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Profile ───────────────────────┐
+│         ( photo )  [ edit ⌗ ]     │
+│         Mannir Ahmad               │
+│         manniru@gmail.com   ✓      │
+│                                     │
+│  KYC LEVEL           Tier 2  ●●○   │
+│  [====progress to Tier 3====]      │
+│                                     │
+│  Account Number      8123 4567 90  │
+│  Customer ID         EP-004821     │
+│  Wallet ID            WLT-9F21A4   │
+│  Member since         Mar 2024     │
+│                                     │
+│  Personal Information        >     │
+│  BVN            Linked ✓      >     │
+│  NIN            Not linked ⚠  >     │
+│  Next of Kin     Not set ⚠     >     │
+│                                     │
+│  [ Edit Profile ]                  │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>UI Components</h4>
+            <ul>
+              <li>Avatar with camera badge (tap → Profile Picture screen)</li>
+              <li>Name + verified-email checkmark inline</li>
+              <li>KYC tier stepper (Tier 1 / 2 / 3) with "what unlocks at Tier 3" tooltip</li>
+              <li>Identifier rows (Account Number, Customer ID, Wallet ID) each with a copy-to-clipboard icon</li>
+              <li>Status rows for BVN / NIN / Next of Kin with colored dot + chevron</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Buttons</h4>
+            <table class="spec">
+              <tr><th>Control</th><th>Action</th></tr>
+              <tr><td><code>Edit ⌗</code> (header)</td><td>Push Edit Profile</td></tr>
+              <tr><td>Copy icon × 3</td><td>Copy value, show toast "Copied"</td></tr>
+              <tr><td>Personal Information row</td><td>Push Edit Profile</td></tr>
+              <tr><td>BVN / NIN rows</td><td>Push respective verification flow (webview/SDK)</td></tr>
+              <tr><td>Next of Kin row</td><td>Push Edit Profile scrolled to Next of Kin section</td></tr>
+              <tr><td>Edit Profile (primary)</td><td>Push Edit Profile</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th><th>Notes</th></tr>
+              <tr><td><code>/v1/users/me</code></td><td>GET</td><td>Cached 60s client-side; pull-to-refresh forces revalidation</td></tr>
+              <tr><td><code>/v1/users/me/kyc-status</code></td><td>GET</td><td>Returns tier, missing fields, next-tier requirements</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Loading / Empty / Error</h4>
+              <ul>
+                <li><strong>Loading:</strong> skeleton rows matching final layout (avatar circle + 6 shimmer bars)</li>
+                <li><strong>Empty:</strong> not applicable — profile always exists post-signup</li>
+                <li><strong>Error:</strong> full-bleed error state, "Couldn't load your profile" + Retry; cached last-known copy shown with a stale-data banner if available</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Success State</h4>
+              <p>No explicit success toast on view — the loaded screen itself is the success state. Copy actions show a 1.5s toast.</p>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Navigation Flow</h4>
+            <pre class="receipt">More → Profile Overview
+  ├─ tap avatar/edit → Profile Picture
+  ├─ tap Personal Information → Edit Profile
+  ├─ tap BVN → BVN Verification (NIBSS/provider webview)
+  ├─ tap NIN → NIN Verification (NIMC/provider webview)
+  └─ tap Next of Kin → Edit Profile (§Next of Kin)</pre>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>KYC tier downgraded by compliance mid-session → banner explaining why + link to Help Center ticket, cached limits refreshed on next transaction attempt</li>
+              <li>BVN/NIN linked but provider returns name mismatch → show "Verification needs review" pill, not a hard fail, and auto-open a support ticket</li>
+              <li>Account Number unavailable for wallet-only (unbanked) tiers → row hidden, not shown as "—"</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <ul>
+              <li>BVN is masked everywhere except the linked provider's own consent screen (never rendered in-app in full)</li>
+              <li>Screen is excluded from screenshots on Android (<code>FLAG_SECURE</code> is <em>not</em> required here, but the Next screens with PIN entry are)</li>
+              <li>All identifier copy actions are logged for support traceability, not blocked</li>
+            </ul>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Backend / DB</h4>
+              <table class="spec">
+                <tr><th>Table</th><th>Key columns</th></tr>
+                <tr><td><code>users</code></td><td>id, first_name, last_name, middle_name, email, email_verified_at, phone, phone_verified_at, dob, gender, nationality, occupation, created_at</td></tr>
+                <tr><td><code>user_addresses</code></td><td>user_id, country, state, lga, street_address, is_primary</td></tr>
+                <tr><td><code>kyc_records</code></td><td>user_id, tier, bvn_status, nin_status, verified_at, provider_ref</td></tr>
+                <tr><td><code>next_of_kin</code></td><td>user_id, full_name, relationship, phone, email, address</td></tr>
+              </table>
+            </div>
+            <div class="field">
+              <h4>Audit / Notifications</h4>
+              <ul>
+                <li>Audit event: <code>profile.viewed</code> (low priority, sampled)</li>
+                <li>No notification triggered by view</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="profile-edit">
+        <div class="screen-head">
+          <span class="tag">Account · Profile</span>
+          <h3>Edit Profile</h3>
+          <p class="dek">Form for personal information, address, and next-of-kin — the fields that determine KYC tier and dispute contact.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Let the user correct or complete identity data, while protecting the fields that are legally load-bearing (name, DOB) behind stricter change control than cosmetic fields (occupation, address).</p>
+          </div>
+          <div class="field">
+            <h4>User Story</h4>
+            <p>As a user, I want to update my address and next of kin myself, and request a correction to my legal name or date of birth without being able to silently change my identity after BVN verification.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Edit Profile ─────────────────┐
+│ PERSONAL INFORMATION               │
+│  First name     [ Mannir      ] 🔒 │
+│  Last name      [ Ahmad       ] 🔒 │
+│  Middle name    [             ]    │
+│  Email          [ manniru@... ] ✓  │
+│  Phone number   [ +234 803... ] ✓  │
+│  Date of birth  [ 14 Feb 1994 ] 🔒 │
+│  Gender         ( M )  ( F )       │
+│  Occupation     [ Software Eng ▾]  │
+│  Nationality    [ Nigerian    ▾]   │
+│                                     │
+│ ADDRESS                            │
+│  Country        [ Nigeria     ▾]   │
+│  State          [ Kano        ▾]   │
+│  LGA            [ Nassarawa   ▾]   │
+│  Street address [             ]    │
+│                                     │
+│ NEXT OF KIN                        │
+│  Full name      [             ]    │
+│  Relationship   [ Select      ▾]   │
+│  Phone number   [             ]    │
+│  Email          [ optional    ]    │
+│  Address        [ optional    ]    │
+│                                     │
+│  [        Save Changes        ]    │
+│  [           Cancel            ]    │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>UI Components</h4>
+            <ul>
+              <li>Locked fields (🔒 First/Last name, DOB) render as read-only with a "Request correction" link instead of an inline editable field</li>
+              <li>Email / Phone fields show inline verified badge; editing either clears the badge and re-triggers OTP verification on save</li>
+              <li>State → LGA is a dependent picker (LGA list loads on State selection)</li>
+              <li>Sticky bottom action bar with Save Changes (primary) / Cancel (text button)</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Validation Rules</h4>
+            <table class="spec">
+              <tr><th>Field</th><th>Rule</th></tr>
+              <tr><td>Middle name</td><td>Optional, letters/hyphen/space only, max 50 chars</td></tr>
+              <tr><td>Email</td><td>RFC 5322 format; must be unique across <code>users</code>; triggers OTP if changed</td></tr>
+              <tr><td>Phone</td><td>E.164, Nigerian MSISDN validated against carrier prefix list; unique; triggers OTP if changed</td></tr>
+              <tr><td>Occupation</td><td>Required, select from taxonomy list (not free text) for AML reporting consistency</td></tr>
+              <tr><td>Street address</td><td>Required, 5–120 chars</td></tr>
+              <tr><td>Next of Kin phone</td><td>Required if any NOK field filled; E.164 format; cannot equal user's own phone</td></tr>
+              <tr><td>Name / DOB change</td><td>Not directly editable — opens "Request Correction" flow → support ticket with document upload, reviewed by compliance within 3 business days</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th><th>Notes</th></tr>
+              <tr><td><code>/v1/users/me</code></td><td>PATCH</td><td>Partial update; server diffs email/phone to decide if OTP step is required</td></tr>
+              <tr><td><code>/v1/users/me/next-of-kin</code></td><td>PUT</td><td>Upsert single record</td></tr>
+              <tr><td><code>/v1/lookups/states</code>, <code>/v1/lookups/lgas?state=</code></td><td>GET</td><td>Cached 24h</td></tr>
+              <tr><td><code>/v1/support/tickets</code></td><td>POST</td><td>type=<code>identity_correction</code>, used by name/DOB request</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Loading / Error / Success</h4>
+              <ul>
+                <li><strong>Loading:</strong> Save button shows inline spinner, form disabled</li>
+                <li><strong>Error:</strong> field-level inline errors from server 422; toast for network/5xx: "Couldn't save changes — check your connection"</li>
+                <li><strong>Success:</strong> toast "Profile updated" → pop to Overview; if email/phone changed, redirect into OTP Verification first, save only commits after OTP confirms</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Navigation Flow</h4>
+              <pre class="receipt">Edit Profile
+  ├─ email/phone changed + Save
+  │     → OTP Verification → on success, PATCH commits
+  ├─ unchanged fields + Save
+  │     → PATCH commits → toast → pop
+  └─ Cancel with unsaved changes
+        → "Discard changes?" confirm sheet</pre>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>User backgrounds app mid-OTP after changing email → on resume, resend option shown, draft form state preserved locally</li>
+              <li>New email already registered to another account → 409, inline error "This email is already in use"</li>
+              <li>State changed but LGA left stale from previous state → client clears LGA on State change to force reselection</li>
+              <li>Tier-1 (BVN-unverified) user edits address → allowed freely; Tier-2+ address edit flags a re-verification review if it changes state (AML geographic risk rule)</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <ul>
+              <li>Name/DOB are immutable client-side by design — prevents identity-swap fraud post-verification</li>
+              <li>Email/phone change requires OTP to the <em>new</em> channel, not the old one, to prove ownership</li>
+              <li>Every field change writes a before/after diff to the audit log, not just the final state</li>
+            </ul>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Database Tables</h4>
+              <p><code>users</code>, <code>user_addresses</code>, <code>next_of_kin</code> (as above) + <code>identity_correction_requests</code>(user_id, field, old_value, new_value, document_url, status, reviewed_by)</p>
+            </div>
+            <div class="field">
+              <h4>Audit Log Events</h4>
+              <div class="chip-row"><span class="chip">profile.field_updated</span><span class="chip">profile.email_change_requested</span><span class="chip">profile.correction_requested</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="profile-verify">
+        <div class="screen-head">
+          <span class="tag">Account · Profile</span>
+          <h3>Verify Email / Verify Phone (OTP)</h3>
+          <p class="dek">Shared OTP verification component, reused by Profile, Security, and Cards &amp; Banks wherever a channel needs proof of ownership.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Confirm the user actually controls the email/phone before it's trusted for password reset, transaction alerts, or dispute contact.</p>
+          </div>
+          <div class="field">
+            <h4>User Story</h4>
+            <p>As a user, I want a fast, obvious way to confirm a 6-digit code so changing my contact details doesn't feel like extra homework.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Verify your email ─────────────┐
+│  We sent a 6-digit code to         │
+│  m•••••u@gmail.com                 │
+│                                     │
+│   [_] [_] [_] [_] [_] [_]          │
+│                                     │
+│  Resend code in 0:47               │
+│  Didn't get it? Use phone instead  │
+│                                     │
+│  [          Verify           ]     │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Validation</h4>
+            <ul>
+              <li>6 numeric digits, auto-submits on 6th digit entered</li>
+              <li>Code expires in 5 minutes; max 5 attempts per code before lockout</li>
+              <li>Resend cooldown 60s, capped at 5 resends per hour per channel</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/otp/send</code> <code>{channel, purpose}</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/otp/verify</code> <code>{channel, code, purpose}</code></td><td>POST</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Error / Success</h4>
+              <ul>
+                <li><strong>Wrong code:</strong> shake animation + "Incorrect code, N attempts left"</li>
+                <li><strong>Expired:</strong> "This code has expired — resend"</li>
+                <li><strong>Locked out:</strong> "Too many attempts — try again in 15 min", channel locked</li>
+                <li><strong>Success:</strong> checkmark animation → toast "Email verified" → pop back</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>Purpose-bound codes: an email-verify OTP cannot be replayed to confirm a PIN reset (server validates <code>purpose</code>)</li>
+                <li>User already verified via another device mid-flow → poll/refresh shows "Already verified" success state</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <ul>
+              <li>Rate-limited per user <em>and</em> per device/IP to block enumeration/brute force</li>
+              <li>OTPs are single-use, invalidated immediately on success or on a new code being requested</li>
+              <li>All OTP attempts (success/fail) logged with masked destination, never the raw code</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Notifications &amp; Audit</h4>
+            <p>Email/SMS: "Your EmirePay code is 482913, valid for 5 minutes." Audit: <code>otp.sent</code>, <code>otp.verified</code>, <code>otp.failed</code>, <code>otp.locked</code>.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="profile-picture">
+        <div class="screen-head">
+          <span class="tag">Account · Profile</span>
+          <h3>Profile Picture</h3>
+          <p class="dek">Upload, preview, crop, and remove the avatar shown across the app.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Personalize the account and make the identity card at the top of More instantly recognizable — cosmetic, not KYC-relevant.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Profile Photo ──────────────────┐
+│                                     │
+│           (   photo   )            │
+│                                     │
+│   [ Take Photo ]  [ Choose Photo ] │
+│   [        Remove Photo        ]   │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Buttons / Actions</h4>
+            <ul>
+              <li><strong>Take Photo</strong> → camera permission → capture → crop (1:1) → preview → confirm</li>
+              <li><strong>Choose Photo</strong> → gallery/photo-library permission → picker → crop → confirm</li>
+              <li><strong>Remove Photo</strong> → confirm sheet → reverts to initials avatar</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Validation</h4>
+            <ul>
+              <li>JPEG/PNG/HEIC only, max 8MB pre-compression, client compresses to ≤ 500KB / 1024px before upload</li>
+              <li>Basic content moderation on upload (server-side NSFW classifier); rejected images return 422 with "This photo can't be used"</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/users/me/avatar</code></td><td>POST (multipart)</td></tr>
+              <tr><td><code>/v1/users/me/avatar</code></td><td>DELETE</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Loading / Error / Success</h4>
+              <ul>
+                <li><strong>Loading:</strong> upload progress ring over the preview</li>
+                <li><strong>Error:</strong> "Upload failed — try again" with Retry, original photo restored</li>
+                <li><strong>Success:</strong> toast "Photo updated", avatar refreshes across app (header, More, receipts)</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Permissions &amp; Edge Cases</h4>
+              <ul>
+                <li>Camera/gallery permission denied → deep-link to OS Settings with explanation sheet</li>
+                <li>Removing photo when none is set → button disabled/hidden</li>
+                <li>Slow network mid-upload → cancel button available, falls back to previous photo</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Backend / Audit</h4>
+            <p>Stored in object storage (e.g. S3-compatible bucket) at <code>avatars/{userId}/{hash}.jpg</code>; <code>users.avatar_url</code> updated on success. Audit: <code>profile.avatar_updated</code>, <code>profile.avatar_removed</code>.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="security">
+      <div class="mod-head"><span class="mod-num">02</span><h2>Security &amp; PIN</h2></div>
+      <p class="mod-intro">This is the module a regulator, an auditor, and a fraud victim will all scrutinize first. Every screen here assumes hostile conditions: a stolen phone, a SIM-swap attempt, a phishing OTP request. The PIN is the transaction-authorization secret (used at payment time); the Password is the account-login secret; they are changed independently and never displayed, echoed, or logged.</p>
+
+      <article class="screen" id="security-hub">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Security Hub</h3>
+          <p class="dek">Command center for everything that protects the account.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Surface security posture (last login, active sessions, 2FA status) up front, not buried, so a worried user can self-serve "lock everything down" in under 30 seconds.</p>
+          </div>
+          <div class="field">
+            <h4>User Story</h4>
+            <p>As a user who thinks something is wrong, I want one screen that shows me my recent logins and lets me kill every other session immediately, without having to find each control separately.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Security & PIN ─────────────────┐
+│  ⚠ Last login: Kano, today 09:14   │
+│    Not you? [ Secure my account ]  │
+│                                     │
+│  AUTHENTICATION                    │
+│   Transaction PIN            >     │
+│   Password                    >     │
+│   Two-Factor Authentication  Off > │
+│   Biometric Login            On  > │
+│                                     │
+│  DEVICES & SESSIONS                │
+│   Trusted Devices (2)         >     │
+│   Login Sessions              >     │
+│   [   Log out other devices   ]    │
+│                                     │
+│  ALERTS                            │
+│   Security Alerts            On  > │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>UI Components</h4>
+            <ul>
+              <li>Risk banner (conditional) — only rendered when last login geo/device differs from the prior 5 logins</li>
+              <li>Grouped rows identical in style to More screen (icon, label, trailing chevron or status)</li>
+              <li>Inline switches for 2FA/Biometric that push into their own setup flow on enable, and confirm-with-PIN on disable</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/overview</code></td><td>GET — last login, session count, 2FA/biometric flags, risk flag</td></tr>
+              <tr><td><code>/v1/security/sessions/logout-others</code></td><td>POST</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Navigation Flow</h4>
+            <pre class="receipt">Security Hub
+ ├─ Transaction PIN → Change PIN (PIN-gated)
+ ├─ Password → Change Password (password-gated)
+ ├─ Two-Factor → 2FA Setup
+ ├─ Biometric → Biometric Enrollment (§Preferences)
+ ├─ Trusted Devices → Device Management
+ ├─ Login Sessions → Session History
+ └─ Security Alerts → Alerts settings</pre>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>"Not you?" tap → force logout-all + immediate password reset flow + auto-opened fraud ticket</li>
+              <li>Account already locked by fraud engine → hub shows a full-width lock banner, all rows disabled except "Contact Support"</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <p>Screen is <code>FLAG_SECURE</code> (Android) / screenshot-blocked, session-only cache, re-fetches on every entry (no stale risk banner).</p>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">security.hub_viewed</span><span class="chip">security.not_me_reported</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="security-pin-change">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Change Transaction PIN</h3>
+          <p class="dek">4–6 digit PIN used to authorize every payment, transfer, and bill.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Let a user rotate their transaction PIN on their own schedule (e.g. after sharing a phone, or on a security scare) without needing support intervention.</p>
+          </div>
+          <div class="field">
+            <h4>User Story</h4>
+            <p>As a user, I want to change my 4-digit PIN by confirming my current one, so no one who glimpsed my old PIN can keep transacting on my account.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">Step 1/3            Step 2/3            Step 3/3
+Enter current PIN    Enter new PIN       Confirm new PIN
+[● ● ● ●]            [_ _ _ _]           [_ _ _ _]
+                      Must differ from
+                      last 3 PINs</pre>
+          </div>
+          <div class="field">
+            <h4>Validation Rules</h4>
+            <ul>
+              <li>Exactly 4 digits (6-digit optional per account settings)</li>
+              <li>Reject sequential (1234, 4321) and repeated (1111) PINs</li>
+              <li>Cannot match current PIN or last 3 previous PINs (hashed comparison, server-side)</li>
+              <li>Cannot equal 4 digits of the user's own DOB or phone number tail</li>
+              <li>Confirm step must exactly match new PIN, else "PINs don't match, try again" and both fields clear</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/pin/verify</code></td><td>POST — validates current PIN before allowing step 2</td></tr>
+              <tr><td><code>/v1/security/pin/change</code></td><td>POST <code>{currentPin, newPin}</code>, both sent over TLS, never logged</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Error States</h4>
+              <ul>
+                <li>Wrong current PIN → "Incorrect PIN, N attempts left" (3 attempts → 30 min lockout → email alert)</li>
+                <li>Weak new PIN → inline rule violation list, submit disabled until resolved</li>
+                <li>Network failure mid-change → "Change not saved — try again", old PIN remains active</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Success State</h4>
+              <p>Checkmark animation, toast "PIN changed successfully", auto-logout of all <em>other</em> sessions, push+email notification sent, return to Security Hub.</p>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>3 consecutive wrong current-PIN attempts → PIN locked, forces Forgot PIN flow (BVN/OTP-based reset) instead of retry</li>
+              <li>User changes PIN, then immediately tries a transaction on a second device with the old PIN cached → server rejects, forces re-auth</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <ul>
+              <li>PIN is hashed (Argon2id) server-side, never stored or transmitted in plaintext beyond the TLS session</li>
+              <li>Keypad uses randomized digit layout option to defeat shoulder-surfing (configurable)</li>
+              <li>Rate limiting: 3 fails → 30 min lock; 3 lockouts in 24h → account flagged for manual review</li>
+            </ul>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Database</h4>
+              <p><code>user_credentials</code>(user_id, pin_hash, pin_updated_at, pin_fail_count, pin_locked_until, pin_history[]&nbsp;hashed)</p>
+            </div>
+            <div class="field">
+              <h4>Notifications / Audit</h4>
+              <p>Push+Email+SMS: "Your transaction PIN was changed just now. Not you? Contact support immediately." Audit: <code>pin.changed</code>, <code>pin.change_failed</code>, <code>pin.locked</code>.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="security-pin-reset">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Forgot / Reset PIN</h3>
+          <p class="dek">Recovery path when the current PIN is unknown or locked — deliberately slower and more heavily verified than a normal change.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Restore transacting ability to the legitimate owner while making the flow expensive enough that an attacker holding only the phone (no BVN/ID) can't reset the PIN and drain the wallet.</p>
+          </div>
+          <div class="field">
+            <h4>User Story</h4>
+            <p>As a user who forgot my PIN, I want to reset it using identity verification I already completed at signup, without having to visit a branch.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">Step 1  Verify identity
+  ( ) OTP to registered phone
+  ( ) OTP to registered email
+  ( ) BVN re-verification (if steps 1–2 fail)
+Step 2  Enter new PIN
+Step 3  Confirm new PIN
+Step 4  Success — cooldown notice</pre>
+          </div>
+          <div class="field">
+            <h4>Validation / Business Logic</h4>
+            <ul>
+              <li>Requires two independent verification factors, not one (e.g. OTP + last-4-of-BVN, or OTP + selfie liveness match against BVN photo)</li>
+              <li>New PIN follows the same strength rules as Change PIN</li>
+              <li>24-hour transaction limit reduction (e.g. capped at ₦50,000) applied automatically for 24h after any PIN reset, regardless of amount previously allowed — standard fraud-mitigation cooldown</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/pin/reset/initiate</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/otp/verify</code></td><td>POST (reused, purpose=<code>pin_reset</code>)</td></tr>
+              <tr><td><code>/v1/security/pin/reset/complete</code></td><td>POST <code>{newPin}</code></td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Error / Success</h4>
+            <ul>
+              <li>Identity verification fails twice → escalate to Help Center ticket with manual agent review (no further in-app retry same day)</li>
+              <li>Success → toast "PIN reset. A 24h security limit applies to keep your account safe." + forced logout of other sessions</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <p>This is the single highest-value target for social engineering in the whole app — every step is logged with device fingerprint + IP + geolocation, and a reset from a never-seen-before device additionally requires a 1-hour delay ("cool-off") before completion, communicated clearly in-flow.</p>
+          </div>
+          <div class="field">
+            <h4>Notifications / Audit</h4>
+            <p>Immediate push+email+SMS on initiation <em>and</em> completion (two separate alerts). Audit: <code>pin.reset_initiated</code>, <code>pin.reset_completed</code>, <code>pin.reset_denied</code>.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="security-password">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Change / Forgot Password</h3>
+          <p class="dek">Login credential, separate from the transaction PIN.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to change my login password proactively, or recover it via email/SMS if I forget it, without that action alone letting anyone move money (PIN stays separate).</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">Change Password           Forgot Password
+Current password [••••]   Enter registered email
+New password      [    ]  → OTP / reset link sent
+Confirm password  [    ]  → Set new password
+Strength: ▓▓▓░░ Good      → Confirm password</pre>
+          </div>
+          <div class="field">
+            <h4>Validation Rules</h4>
+            <ul>
+              <li>Min 10 characters, at least 1 upper, 1 lower, 1 number, 1 symbol</li>
+              <li>Rejected against a common-password/breached-password list (e.g. HaveIBeenPwned range API)</li>
+              <li>Cannot reuse last 5 passwords</li>
+              <li>Live strength meter (weak/fair/good/strong) as the user types</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/auth/password/change</code></td><td>POST (authenticated)</td></tr>
+              <tr><td><code>/v1/auth/password/forgot</code></td><td>POST <code>{email}</code> — always 200, never reveals if email exists</td></tr>
+              <tr><td><code>/v1/auth/password/reset</code></td><td>POST <code>{token/otp, newPassword}</code></td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Error / Success</h4>
+              <ul>
+                <li>Wrong current password → "Incorrect password" (5 fails → 15 min lock)</li>
+                <li>Reset link expired (15 min TTL) → "This link has expired, request a new one"</li>
+                <li>Success → all sessions except current logged out, confirmation email sent, toast "Password updated"</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Security</h4>
+              <ul>
+                <li>Bcrypt/Argon2id hashing, per-user salt</li>
+                <li>Forgot-password response is identical whether or not the email exists (anti-enumeration)</li>
+                <li>Reset tokens are single-use, invalidated on password change</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">password.changed</span><span class="chip">password.reset_requested</span><span class="chip">password.reset_completed</span><span class="chip">password.change_failed</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="security-devices">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Device Management</h3>
+          <p class="dek">Trusted devices list — see what's logged in, remove anything unrecognized.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to see every device currently able to access my account and revoke access from any I don't recognize or no longer own.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Trusted Devices ────────────────┐
+│  📱 Pixel 8 · This device          │
+│     Kano, NG · Active now          │
+│                                     │
+│  💻 Chrome / Windows                │
+│     Lagos, NG · 3 days ago  [ ⋮ ]  │
+│     → Remove device                │
+│                                     │
+│  [    Log out of all other devices ]│
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>UI Components</h4>
+            <ul>
+              <li>Device row: platform icon, device name/model, last-seen location + relative time, "This device" badge for current session</li>
+              <li>Per-row overflow menu → Remove device (PIN-gated confirm)</li>
+              <li>Bulk action: Log out of all other devices</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/devices</code></td><td>GET</td></tr>
+              <tr><td><code>/v1/security/devices/{id}</code></td><td>DELETE</td></tr>
+              <tr><td><code>/v1/security/devices/logout-others</code></td><td>POST</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Empty / Error / Success</h4>
+              <ul>
+                <li><strong>Empty:</strong> impossible — current device always present</li>
+                <li><strong>Error:</strong> "Couldn't load devices" + Retry</li>
+                <li><strong>Success:</strong> row fades out on removal, toast "Device removed"</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>Attempting to remove "This device" → blocked client-side, routed to full Logout flow instead</li>
+                <li>Device removed mid-session on that device → next API call 401s, forces re-login with a clear "You were signed out from another device" message</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Database / Notifications / Audit</h4>
+            <p><code>user_devices</code>(id, user_id, device_name, platform, push_token, last_ip, last_geo, last_seen_at, trusted_at, revoked_at). Push/email on removal: "A device was removed from your account." Audit: <code>device.removed</code>, <code>device.logout_others</code>.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="security-sessions">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Login Sessions</h3>
+          <p class="dek">Full chronological history — successful logins, failed attempts, and current session detail.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user investigating suspicious activity, I want a timestamped history of logins and failed attempts, not just active devices, so I can tell how far back a compromise might go.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Login Sessions ─────────────────┐
+│  Today                             │
+│   ✓ 09:14  Pixel 8 · Kano          │
+│  Yesterday                         │
+│   ✓ 18:02  Pixel 8 · Kano          │
+│   ✕ 17:58  Unknown · Lagos (wrong  │
+│             password, 3 attempts)  │
+│  Jul 3                             │
+│   ✓ 08:40  Chrome/Win · Lagos      │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Components</h4>
+            <ul>
+              <li>Grouped by day, ✓ success (green) / ✕ failed (red) icon per row</li>
+              <li>Failed rows show attempt count and reason (wrong password / wrong OTP / blocked-by-fraud-rule)</li>
+              <li>Infinite scroll, 20 per page</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/login-history?cursor=</code></td><td>GET</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Empty / Error</h4>
+            <p>Empty state doesn't occur (current login always present). Error: "Couldn't load history" + Retry, paginated fetch failures show inline retry row rather than full-screen error.</p>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>3+ failed attempts in a row from a new location → row highlighted with a warning tint and a "Secure my account" inline CTA</li>
+              <li>History &gt; 90 days old → archived, "Request full history" link opens a support ticket (data retention policy)</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Database / Audit</h4>
+            <p><code>login_attempts</code>(id, user_id, status, method, ip, geo, device_id, failure_reason, created_at). This screen <em>is</em> a read view of the audit log itself.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="security-2fa">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Two-Factor Authentication</h3>
+          <p class="dek">Optional second factor on login: authenticator app or SMS/push, plus security questions as a fallback.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user who wants maximum protection, I want to require a second factor at login, so a leaked password alone can't get into my account.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Two-Factor Authentication ──────┐
+│  Add a second step when signing in │
+│                                     │
+│  ( ) Authenticator app (TOTP)      │
+│  ( ) SMS code                      │
+│  ( ) Push approval                 │
+│                                     │
+│  [ scan QR / enter secret ]        │
+│  Confirm code: [_ _ _ _ _ _]       │
+│                                     │
+│  Backup codes (10) [ View / Save ] │
+│  Security questions        Set >   │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Business Logic</h4>
+            <ul>
+              <li>Enabling requires confirming one valid code from the chosen method before it's turned on</li>
+              <li>10 single-use backup codes generated on enable, must be acknowledged as "saved" before proceeding</li>
+              <li>Disabling 2FA requires password + current 2FA code (can't disable with just the password)</li>
+              <li>Security Questions act as a fallback recovery factor only, never as the primary 2FA method</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/2fa/setup</code></td><td>POST <code>{method}</code> → returns TOTP secret/QR or triggers SMS</td></tr>
+              <tr><td><code>/v1/security/2fa/confirm</code></td><td>POST <code>{code}</code></td></tr>
+              <tr><td><code>/v1/security/2fa/backup-codes</code></td><td>GET</td></tr>
+              <tr><td><code>/v1/security/2fa/disable</code></td><td>POST <code>{password, code}</code></td></tr>
+              <tr><td><code>/v1/security/questions</code></td><td>PUT <code>[{question, answerHash}]</code></td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Error / Success</h4>
+              <ul>
+                <li>Invalid confirm code → "Incorrect code" inline, no lockout on setup (low risk, not yet enabled)</li>
+                <li>Success → toast "Two-factor authentication enabled", email confirmation sent</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>User loses authenticator device and has no backup codes → identity-verified account recovery via Help Center only (no in-app bypass, by design)</li>
+                <li>SMS 2FA on a number later ported/SIM-swapped → flagged by fraud engine, prompts a forced re-verification</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Security / Audit</h4>
+            <p>TOTP secrets encrypted at rest (KMS-managed key); backup codes stored as salted hashes, shown once only. Audit: <code>2fa.enabled</code>, <code>2fa.disabled</code>, <code>2fa.backup_code_used</code>, <code>security_questions.updated</code>.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="security-alerts">
+        <div class="screen-head">
+          <span class="tag">Account · Security</span>
+          <h3>Security Alerts, Fraud Detection &amp; Account Lock</h3>
+          <p class="dek">Where the system talks back — risk warnings, forced locks, and the alert preferences controlling them.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose</h4>
+            <p>Make the fraud engine's decisions visible and actionable instead of a silent black box — every block or hold should tell the user what happened and what to do next.</p>
+          </div>
+          <div class="field">
+            <h4>Business Logic — Risk Tiers</h4>
+            <table class="spec">
+              <tr><th>Trigger</th><th>System response</th><th>User sees</th></tr>
+              <tr><td>New device + high-value transfer</td><td>Step-up: OTP + PIN</td><td>"For your security, confirm this transfer"</td></tr>
+              <tr><td>Velocity anomaly (many transfers, short window)</td><td>Soft hold, 15 min</td><td>"Reviewing this transaction — back shortly" banner</td></tr>
+              <tr><td>Impossible travel (login from 2 countries &lt; 1h apart)</td><td>Force logout + password reset</td><td>Lock screen with explanation + reset CTA</td></tr>
+              <tr><td>Repeated failed PIN across devices</td><td>Full account lock</td><td>Locked screen, "Contact support to unlock" + auto-ticket</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Screen Layout — Alert Preferences</h4>
+            <pre class="receipt">┌ ← Security Alerts ────────────────┐
+│  New device login       [ On  ]    │
+│  Failed PIN attempts    [ On  ]    │
+│  Large transaction hold [ On  ]    │
+│  Password/PIN changes   [ On  ]  🔒│
+└─────────────────────────────────────┘
+🔒 = cannot be disabled (regulatory)</pre>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/alert-preferences</code></td><td>GET/PATCH</td></tr>
+              <tr><td><code>/v1/security/fraud-events</code></td><td>GET — user-facing history of holds/flags</td></tr>
+              <tr><td><code>/v1/security/unlock-request</code></td><td>POST — opens support ticket for a locked account</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>Core alerts (PIN/password change, new-device login) are non-optional — toggle renders locked with a tooltip explaining why</li>
+              <li>User disables push but keeps SMS — critical alerts (account lock, PIN change) always fan out to <em>all</em> enabled channels regardless of per-category prefs</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <p>Fraud thresholds and rule internals are never exposed in-app (only outcomes and next steps) to avoid coaching attackers around the rules.</p>
+          </div>
+          <div class="field">
+            <h4>Database / Audit</h4>
+            <p><code>fraud_events</code>(id, user_id, rule_code, severity, action_taken, resolved_at). Audit: <code>fraud.flag_raised</code>, <code>fraud.account_locked</code>, <code>fraud.unlock_requested</code>.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="cards">
+      <div class="mod-head"><span class="mod-num">03</span><h2>Cards &amp; Banks</h2></div>
+      <p class="mod-intro">Every linked instrument here is a money-movement rail, so onboarding a new bank or card is treated like a mini-KYC event (ownership verification), and every destructive action (remove, delete, freeze) is PIN-gated. Virtual cards are issued instantly; physical cards go through a request-and-ship flow out of scope for in-app real-time state beyond "requested / shipped / delivered."</p>
+
+      <article class="screen" id="cards-hub">
+        <div class="screen-head">
+          <span class="tag">Account · Cards &amp; Banks</span>
+          <h3>Cards &amp; Banks Hub</h3>
+          <p class="dek">Overview of every linked bank and card, with default indicators.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to see all my linked banks and cards in one place, know which is set as default for payments, and get to add/remove actions quickly.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Cards & Banks ──────────────────┐
+│  LINKED BANKS                      │
+│  🏦 GTBank •••7821      Default    │
+│  🏦 Kuda •••1092              >    │
+│  [ + Add Bank ]                    │
+│                                     │
+│  CARDS                             │
+│  💳 Virtual •• 4482    Active      │
+│  💳 Physical •• 9021   Frozen  >   │
+│  [ + Add Card ]  [ Request Physical ]│
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>UI Components</h4>
+            <ul>
+              <li>Bank/card row: issuer logo, masked number, status pill (Default / Active / Frozen / Expired)</li>
+              <li>Swipe-to-reveal or overflow menu for quick actions (set default, freeze, remove)</li>
+              <li>Section-level add actions pinned at bottom of each group</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/banks/linked</code></td><td>GET</td></tr>
+              <tr><td><code>/v1/cards</code></td><td>GET</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Empty / Loading / Error</h4>
+              <ul>
+                <li><strong>Empty:</strong> "No banks linked yet — add one to start withdrawing" illustration + CTA (cards has its own empty variant)</li>
+                <li><strong>Loading:</strong> skeleton rows</li>
+                <li><strong>Error:</strong> inline retry per section (banks can fail independently of cards)</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>KYC Tier 1 user → Add Card/Add Bank rows visible but disabled with "Complete verification to add a bank" tooltip</li>
+                <li>Only one bank linked and user tries to remove it → blocked: "You need at least one linked bank" (needed for withdrawal rail)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Navigation Flow</h4>
+            <pre class="receipt">Hub → + Add Bank → Add Bank flow
+Hub → + Add Card → Add Card flow
+Hub → bank row → Bank Detail
+Hub → card row → Card Detail
+Hub → Request Physical → Physical Card Request</pre>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="cards-add-bank">
+        <div class="screen-head">
+          <span class="tag">Account · Cards &amp; Banks</span>
+          <h3>Add Bank</h3>
+          <p class="dek">Link an external bank account for withdrawals, verified by name-match before it's usable.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to add my bank account by picking my bank and entering my account number, and have the app confirm it's really mine before I can withdraw to it.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">Step 1: Select bank      Step 2: Confirm
+[ Search banks...    ]   Account name:
+  GTBank                  MANNIR AHMAD ✓
+  Kuda                    (matches profile name)
+  Access Bank              [ Set as default? ]
+  ...                      [ Confirm & Add ]
+Step 3: Account number
+[ 0123456789 ]  (10 digits)</pre>
+          </div>
+          <div class="field">
+            <h4>Validation Rules</h4>
+            <ul>
+              <li>Account number: exactly 10 digits, numeric only</li>
+              <li>Bank selection required before number entry (drives the NIP resolve lookup)</li>
+              <li>Name-match: resolved account name must match the user's registered profile name (fuzzy match ≥ 85%); on mismatch, block linking and route to "This account isn't in your name" explainer with a Help Center link (AML control — no third-party accounts)</li>
+              <li>Duplicate bank+account combo already linked → 409 inline error</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/banks</code></td><td>GET — bank list for search/select</td></tr>
+              <tr><td><code>/v1/banks/resolve</code></td><td>POST <code>{bankCode, accountNumber}</code> → NIP account-name lookup</td></tr>
+              <tr><td><code>/v1/banks/link</code></td><td>POST <code>{bankCode, accountNumber, setDefault}</code></td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Loading / Error / Success</h4>
+              <ul>
+                <li><strong>Loading:</strong> "Verifying account..." spinner during resolve (typically 2–5s)</li>
+                <li><strong>Error:</strong> resolve timeout → "Couldn't verify this account, try again"; name mismatch → hard block (see above)</li>
+                <li><strong>Success:</strong> toast "Bank account added", returns to Hub with new row</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>Bank's NIP endpoint down → "This bank is temporarily unavailable" with Retry, doesn't count as a failed match attempt</li>
+                <li>Joint account whose registered name partially matches → falls to manual review queue instead of hard block</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Security / Audit</h4>
+            <p>No PIN required to add (read-only rail addition), but PIN required to set as default or later withdraw. Audit: <code>bank.link_attempted</code>, <code>bank.linked</code>, <code>bank.link_name_mismatch</code>.</p>
+          </div>
+          <div class="field">
+            <h4>Database</h4>
+            <p><code>linked_banks</code>(id, user_id, bank_code, account_number, account_name, is_default, verified_at, created_at)</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="cards-add-card">
+        <div class="screen-head">
+          <span class="tag">Account · Cards &amp; Banks</span>
+          <h3>Add Card</h3>
+          <p class="dek">Link an external debit/credit card for funding the wallet, verified with a ₦1–₦50 authorization charge.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to add my debit card so I can fund my wallet directly, and trust that entering my card details in-app is safe (PCI-compliant).</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Add Card ────────────────────────┐
+│   [ 4482  ••••  ••••  ••••  ]      │
+│   [ MM/YY ]        [ CVV ]         │
+│   Cardholder name  [           ]    │
+│                                     │
+│  A small charge (₦50) will be made │
+│  to verify this card and refunded. │
+│                                     │
+│  [         Add Card          ]     │
+└─────────────────────────────────────┘
+    → 3-D Secure webview (bank OTP)</pre>
+          </div>
+          <div class="field">
+            <h4>Validation Rules</h4>
+            <ul>
+              <li>Card number: Luhn checksum validated client-side, auto-formatted in groups of 4</li>
+              <li>Expiry must be a future MM/YY</li>
+              <li>CVV: 3 digits (4 for Amex), masked input</li>
+              <li>Only Verve/Mastercard/Visa BINs accepted (checked against issuer BIN table)</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/cards/tokenize</code></td><td>POST — sent directly to PCI-DSS payment processor SDK, never touches app backend in raw form</td></tr>
+              <tr><td><code>/v1/cards/verify</code></td><td>POST <code>{token}</code> → initiates auth-charge + 3DS</td></tr>
+              <tr><td><code>/v1/cards/verify/complete</code></td><td>POST — after 3DS redirect callback</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Loading / Error / Success</h4>
+              <ul>
+                <li><strong>Loading:</strong> "Verifying your card securely..." during 3DS webview</li>
+                <li><strong>Error:</strong> declined → "Your bank declined this card" with issuer's reason code mapped to plain language; 3DS failed → "Verification failed, try again"</li>
+                <li><strong>Success:</strong> toast "Card added and verified", auth-charge auto-reversed within 24–72h (communicated inline)</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>User backgrounds app during 3DS redirect → deep link resumes flow on return; if session expired, restart from card entry</li>
+                <li>Prepaid/virtual competitor cards with funding restrictions → allowed to add, funding attempts may still fail at charge time</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <ul>
+              <li>Raw PAN/CVV never stored or logged by EmirePay backend — tokenization happens client-side via processor SDK (PCI-DSS SAQ-A scope)</li>
+              <li>Only last 4 digits + brand + expiry stored for display</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Database / Audit</h4>
+            <p><code>linked_cards</code>(id, user_id, processor_token, brand, last4, exp_month, exp_year, is_default, status, added_at). Audit: <code>card.add_attempted</code>, <code>card.verified</code>, <code>card.verify_failed</code>.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="cards-card-detail">
+        <div class="screen-head">
+          <span class="tag">Account · Cards &amp; Banks</span>
+          <h3>Card Detail</h3>
+          <p class="dek">Freeze, unfreeze, set default, replace, or delete a linked or issued card; view virtual card credentials.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to instantly freeze a lost card, see my virtual card number when I need to pay online, and delete a card I no longer use — each without contacting support.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Virtual Card ────────────────────┐
+│   ┌───────────────────────┐        │
+│   │  EmirePay              │  (hold │
+│   │  •••• •••• •••• 4482   │  to    │
+│   │  MANNIR AHMAD    09/28 │ reveal)│
+│   └───────────────────────┘        │
+│   Status: Active     [ Freeze ]    │
+│                                     │
+│  Spend limit (daily)  ₦200,000  ✎  │
+│  Set as default              [ ]   │
+│  [ Replace Card ]  [ Delete Card ] │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Buttons &amp; Business Logic</h4>
+            <table class="spec">
+              <tr><th>Action</th><th>Behavior</th></tr>
+              <tr><td>Hold to reveal number/CVV</td><td>Biometric/PIN re-auth required each time, auto-hides after 15s</td></tr>
+              <tr><td>Freeze / Unfreeze</td><td>Immediate, reversible, no PIN required (defensive action should be frictionless)</td></tr>
+              <tr><td>Set spend limit</td><td>PIN-gated, capped at the account's KYC-tier daily limit</td></tr>
+              <tr><td>Replace Card</td><td>PIN-gated; old card frozen immediately, new virtual card issued instantly / physical reissued via shipping flow</td></tr>
+              <tr><td>Delete Card</td><td>PIN-gated + confirm sheet; blocked if card has a pending transaction</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/cards/{id}/reveal</code></td><td>POST — biometric/PIN token required, returns short-lived PAN/CVV</td></tr>
+              <tr><td><code>/v1/cards/{id}/freeze</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/cards/{id}/unfreeze</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/cards/{id}/limits</code></td><td>PATCH <code>{dailyLimit}</code></td></tr>
+              <tr><td><code>/v1/cards/{id}/replace</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/cards/{id}</code></td><td>DELETE</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Error / Success</h4>
+              <ul>
+                <li>Delete blocked (pending txn) → "This card has a pending transaction — try again shortly"</li>
+                <li>Freeze on already-frozen card → idempotent no-op, UI just reflects state</li>
+                <li>Success on any action → inline status pill updates + toast confirmation</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>Deleting the default card → next-oldest active card auto-promoted to default, user notified inline</li>
+                <li>Physical card "Replace" → triggers shipping flow (address confirm), not instant</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <p>Card reveal is the only place raw PAN briefly reaches the client — over a short-lived token (60s TTL), rendered only, never copy-enabled for the full number (last 4 copyable), screen is screenshot-blocked.</p>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">card.revealed</span><span class="chip">card.frozen</span><span class="chip">card.unfrozen</span><span class="chip">card.limit_changed</span><span class="chip">card.replaced</span><span class="chip">card.deleted</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="cards-bank-detail">
+        <div class="screen-head">
+          <span class="tag">Account · Cards &amp; Banks</span>
+          <h3>Bank Detail</h3>
+          <p class="dek">Set default withdrawal bank, or remove a linked bank.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to choose which linked bank receives my withdrawals by default, and remove one I no longer use.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← GTBank ──────────────────────────┐
+│  MANNIR AHMAD                       │
+│  •••• •••• 7821                    │
+│  Linked Mar 12, 2024                │
+│                                     │
+│  Set as default withdrawal   [ ]   │
+│  [        Remove Bank         ]    │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Validation / Business Logic</h4>
+            <ul>
+              <li>Cannot remove the only linked bank (see Hub edge case)</li>
+              <li>Cannot remove a bank with a withdrawal in flight to it (status = processing)</li>
+              <li>Removing the default bank prompts "Choose a new default" before removal completes</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/banks/{id}/set-default</code></td><td>POST — PIN-gated</td></tr>
+              <tr><td><code>/v1/banks/{id}</code></td><td>DELETE — PIN-gated</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Error / Success / Audit</h4>
+            <p>Blocked-removal shows explanatory inline message, not a silent disable. Success: toast "Bank removed" / "Default bank updated". Audit: <code>bank.removed</code>, <code>bank.default_changed</code>.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="cards-limits">
+        <div class="screen-head">
+          <span class="tag">Account · Cards &amp; Banks</span>
+          <h3>Transaction Limits</h3>
+          <p class="dek">Daily and monthly movement limits, tied to KYC tier and adjustable within tier ceilings.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to see how much I can send, withdraw, or spend per day/month, and lower my own limits proactively for self-imposed spending control.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Transaction Limits ─────────────┐
+│  Tier 2 · Daily cap ₦500,000        │
+│                                     │
+│  Send money      [====] ₦120k/500k │
+│  Card spend      [==  ] ₦40k/200k  │
+│  Withdrawal      [=   ] ₦20k/300k  │
+│                                     │
+│  Lower my daily limit        ✎     │
+│  Want a higher limit? Upgrade KYC >│
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Business Logic</h4>
+            <table class="spec">
+              <tr><th>KYC Tier</th><th>Daily limit</th><th>Monthly cap</th></tr>
+              <tr><td>Tier 1 (phone only)</td><td>₦50,000</td><td>₦300,000</td></tr>
+              <tr><td>Tier 2 (BVN linked)</td><td>₦500,000</td><td>₦5,000,000</td></tr>
+              <tr><td>Tier 3 (BVN+NIN+address)</td><td>Unlimited*</td><td>Unlimited*</td></tr>
+            </table>
+            <p style="font-size:12px;color:var(--ink-soft)">*Subject to real-time AML transaction monitoring regardless of tier.</p>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/limits</code></td><td>GET — tier ceiling + current usage + self-imposed limit</td></tr>
+              <tr><td><code>/v1/limits/self-imposed</code></td><td>PATCH — user can only lower, never raise, past tier ceiling</td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>Self-imposed limit lowered below money already committed today → doesn't retroactively block, applies from next transaction</li>
+              <li>Raising a self-imposed limit back up has a 24h cool-off (prevents impulsive-reversal after a spending-control moment)</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">limits.self_imposed_lowered</span><span class="chip">limits.self_imposed_raise_requested</span></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="notifications">
+      <div class="mod-head"><span class="mod-num">04</span><h2>Notifications</h2></div>
+      <article class="screen">
+        <div class="screen-head">
+          <span class="tag">Preferences</span>
+          <h3>Notification Settings</h3>
+          <p class="dek">Granular control over what the app says and how it says it — with security alerts kept non-negotiable.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to turn off marketing noise while keeping transaction and security alerts on, and choose whether they arrive by push, SMS, or email.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Notifications ───────────────────┐
+│  CATEGORIES                         │
+│   Transaction alerts       [ On ]🔒 │
+│   Security alerts          [ On ]🔒 │
+│   Promotions & offers      [ On ]   │
+│   Marketing                [Off ]   │
+│   System updates           [ On ]   │
+│   New features              [ On ]   │
+│                                     │
+│  CHANNELS                          │
+│   Push notifications        [On]   │
+│   SMS                       [On]   │
+│   Email                     [On]   │
+│   In-app                    [On]   │
+│                                     │
+│  SOUND & VIBRATION                 │
+│   Sound     [On]   Vibration [On]  │
+│   [ Preview notification ]         │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>UI Components / Business Logic</h4>
+            <ul>
+              <li>Category × Channel is technically a matrix, but the row-toggle UI ships a simplified 2-tier model: category on/off (what), channel on/off globally (how) — advanced per-category-per-channel matrix is a v2 "Advanced" expandable section for power users</li>
+              <li>Transaction and Security categories render locked (🔒) — cannot be fully disabled, only "reduced to essential" (e.g. large transactions only)</li>
+              <li>Preview button fires a sample local notification using current sound/vibration settings</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/notifications/preferences</code></td><td>GET/PATCH</td></tr>
+              <tr><td><code>/v1/devices/push-token</code></td><td>PUT — registers/refreshes FCM/APNs token</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Error / Success</h4>
+              <ul>
+                <li>Toggle fails to save (network) → switch reverts to previous state, toast "Couldn't update — try again"</li>
+                <li>Success → optimistic UI, no toast (silent save is the norm for settings toggles)</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>OS-level push permission denied → Push toggle shows "Enable in device settings" instead of a functional switch</li>
+                <li>All channels off for a non-locked category → category toggle auto-shows "You won't receive these" hint</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Backend / Audit</h4>
+            <p><code>notification_preferences</code>(user_id, category, channel, enabled). Audit: <code>notifications.preference_changed</code> (category, channel, old→new).</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="biometric">
+      <div class="mod-head"><span class="mod-num">05</span><h2>Biometric Login</h2></div>
+      <article class="screen">
+        <div class="screen-head">
+          <span class="tag">Preferences</span>
+          <h3>Biometric Enrollment</h3>
+          <p class="dek">Face ID / fingerprint as a login and step-up authentication method, with PIN as the mandatory fallback.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to unlock the app and approve payments with my fingerprint or face instead of typing my PIN every time, on a device I trust.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Biometric Login ─────────────────┐
+│         (fingerprint icon)          │
+│   Use your fingerprint to log in    │
+│   and approve payments faster.      │
+│                                     │
+│   [        Enable        ]         │
+│   Your PIN still works as backup.  │
+└─────────────────────────────────────┘
+On enable → OS biometric prompt → done
+On unsupported device → explainer, no toggle shown</pre>
+          </div>
+          <div class="field">
+            <h4>Business Logic</h4>
+            <ul>
+              <li>Device compatibility checked first (Android BiometricPrompt / iOS LocalAuthentication capability + enrolled biometrics)</li>
+              <li>Enrollment binds biometric approval to a device-local key pair; the private key never leaves secure hardware (Keystore/Secure Enclave) and is not synced or recoverable — re-enrollment required per device</li>
+              <li>PIN entry is always available as a fallback on every biometric prompt (3 consecutive biometric failures auto-falls back to PIN)</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/security/biometric/register</code></td><td>POST <code>{deviceId, publicKey}</code></td></tr>
+              <tr><td><code>/v1/security/biometric/disable</code></td><td>POST — PIN-confirmed</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Failure States</h4>
+              <ul>
+                <li>No biometrics enrolled on device → "Set up Face ID/fingerprint in your phone settings first" + deep link to OS settings</li>
+                <li>Hardware unavailable/unsupported → row hidden or disabled with explanatory subtext, no toggle shown</li>
+                <li>Permission denied → same as biometric-not-enrolled path</li>
+                <li>Enrollment interrupted (OS prompt dismissed) → toggle reverts to Off, no partial state</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>User adds a new fingerprint on their device after enrolling → OS may invalidate the bound key; app detects invalidation and silently re-prompts enrollment on next use</li>
+                <li>Uninstall/reinstall app → biometric binding is lost, re-enrollment required (by design, ties to app keystore)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Security / Audit</h4>
+            <p>Biometric match happens entirely on-device via the OS — EmirePay never receives raw biometric data, only a signed assertion from the secure hardware. Audit: <code>biometric.enrolled</code>, <code>biometric.disabled</code>, <code>biometric.key_invalidated</code>.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="theme">
+      <div class="mod-head"><span class="mod-num">06</span><h2>Appearance (Light / Dark / System)</h2></div>
+      <article class="screen">
+        <div class="screen-head">
+          <span class="tag">Preferences</span>
+          <h3>Theme Switching</h3>
+          <p class="dek">Currently a single Light/Dark toggle in the shipped app — spec'd here as the fuller three-way control.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want the app to match my system theme automatically, or override it manually if I prefer light mode at night.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Appearance ──────────────────────┐
+│  ( ) Light                          │
+│  ( ) Dark                           │
+│  (•) Use device setting             │
+│                                     │
+│  [ preview card of current theme ] │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Business Logic</h4>
+            <ul>
+              <li>Three-way radio replaces the current single toggle; "Use device setting" (System Default) is the recommended default for new installs</li>
+              <li>Switch applies with a 200ms cross-fade, not an instant snap, to avoid a jarring flash</li>
+              <li>Choice persists locally (device preference) and syncs to account so it's remembered after reinstall/new device login</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/users/me/preferences</code></td><td>PATCH <code>{theme: light|dark|system}</code></td></tr>
+            </table>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>OS theme changes while app is backgrounded (System Default selected) → theme updates on next foreground, not mid-session jarringly</li>
+              <li>Offline at switch time → applies locally immediately, syncs to account when connectivity returns</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">preferences.theme_changed</span></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="help">
+      <div class="mod-head"><span class="mod-num">07</span><h2>Help Center</h2></div>
+      <p class="mod-intro">Support is layered by cost-to-serve: self-serve FAQ/search first, chatbot second, human channels (chat/WhatsApp/phone/ticket) last — each escalation tier visible and reachable from the same hub.</p>
+
+      <article class="screen" id="help-hub">
+        <div class="screen-head">
+          <span class="tag">Support · Help Center</span>
+          <h3>Help Center Hub</h3>
+          <p class="dek">Searchable FAQ categories plus every support channel in one place.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Help Center ─────────────────────┐
+│  [ 🔍 Search help articles...    ] │
+│                                     │
+│  CATEGORIES                        │
+│  💸 Transfers  📱 Airtime & Data    │
+│  💳 Cards      🔐 Security          │
+│  👤 Account    ⚖️ Disputes          │
+│                                     │
+│  TALK TO US                        │
+│  💬 Live Chat        Online  >     │
+│  🤖 Chatbot                  >     │
+│  📞 Call Support      >     │
+│  🟢 WhatsApp                 >     │
+│  ✉️  Email Support             >     │
+│  🎫 My Tickets (2 open)       >     │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>UI Components</h4>
+            <ul>
+              <li>Search with typeahead against FAQ index, highlights matched terms</li>
+              <li>Category grid → filtered FAQ list per category</li>
+              <li>Channel rows show live status (e.g. "Online" / "Avg wait 3 min" for chat) fetched at open</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/support/faq?query=&amp;category=</code></td><td>GET</td></tr>
+              <tr><td><code>/v1/support/channel-status</code></td><td>GET — chat/phone availability</td></tr>
+              <tr><td><code>/v1/support/tickets</code></td><td>GET — for "My Tickets" badge count</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Empty / Error</h4>
+              <ul>
+                <li>No search results → "No articles found for '…' " + Raise a Ticket CTA</li>
+                <li>Channel status fetch fails → channels still tappable, status badge just omitted</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Navigation</h4>
+              <ul>
+                <li>Live Chat → in-app chat widget (agent or bot handoff)</li>
+                <li>WhatsApp/Phone → external app handoff via <code>url_launcher</code></li>
+                <li>My Tickets → Ticket History list</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Analytics / Audit</h4>
+            <div class="chip-row"><span class="chip">help.searched</span><span class="chip">help.article_opened</span><span class="chip">help.channel_opened</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="help-ticket">
+        <div class="screen-head">
+          <span class="tag">Support · Help Center</span>
+          <h3>Raise Ticket / Ticket History</h3>
+          <p class="dek">Structured support request with attachments, tracked status, and escalation.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">Raise Ticket                Ticket #EP-8821
+Category [ Failed transfer ▾]  Status: In Progress ●
+Subject  [                 ]  Opened: Jul 6, 10:02
+Description                    Last reply: agent, 2h ago
+[                          ]
+[ 📎 Attach screenshot/file ]  [ View conversation ]
+[         Submit           ]  [ Escalate ] [ Close ] [ Rate ]</pre>
+          </div>
+          <div class="field">
+            <h4>Validation Rules</h4>
+            <ul>
+              <li>Category required (drives routing/SLA); Subject 5–120 chars; Description min 20 chars</li>
+              <li>Attachments: image/PDF, max 5 files, 10MB each</li>
+              <li>Transaction-related categories auto-attach the relevant transaction reference (picked from recent history) instead of free text</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/support/tickets</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/support/tickets/{id}</code></td><td>GET</td></tr>
+              <tr><td><code>/v1/support/tickets/{id}/messages</code></td><td>POST — reply/attach</td></tr>
+              <tr><td><code>/v1/support/tickets/{id}/escalate</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/support/tickets/{id}/close</code></td><td>POST</td></tr>
+              <tr><td><code>/v1/support/tickets/{id}/rate</code></td><td>POST <code>{stars, comment}</code></td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Status Lifecycle</h4>
+              <p><span class="pill warn">Open</span> → <span class="pill warn">In Progress</span> → <span class="pill ok">Resolved</span> → <span class="pill ok">Closed</span>, with <span class="pill danger">Escalated</span> branching from any open state.</p>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>Ticket auto-closes after 5 days of no user reply on a "Resolved" ticket, reopenable within 30 days</li>
+                <li>Escalate available only after 24h with no agent reply, or immediately for fraud/security category</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Notifications / Audit</h4>
+            <p>Push/email on every agent reply and status change. Audit: <code>ticket.created</code>, <code>ticket.escalated</code>, <code>ticket.closed</code>, <code>ticket.rated</code>.</p>
+          </div>
+          <div class="field">
+            <h4>Database</h4>
+            <p><code>support_tickets</code>(id, user_id, category, subject, status, priority, created_at, closed_at), <code>ticket_messages</code>(ticket_id, sender_type, body, attachment_urls, created_at)</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="refer">
+      <div class="mod-head"><span class="mod-num">08</span><h2>Refer &amp; Earn</h2></div>
+
+      <article class="screen" id="refer-dashboard">
+        <div class="screen-head">
+          <span class="tag">Support · Refer &amp; Earn</span>
+          <h3>Referral Dashboard</h3>
+          <p class="dek">Personal code, shareable link/QR, and running earnings — the growth-loop screen.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to share my referral code easily and see how much I've earned, so inviting friends feels worthwhile and trackable.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Refer & Earn ────────────────────┐
+│   Earn ₦1,000 for every friend      │
+│   who signs up and verifies KYC.    │
+│                                     │
+│   Your code:  MANNIR200    [Copy]  │
+│   [       ▨ QR Code       ]        │
+│   [ Share ]  🟢 WhatsApp 📱 SMS     │
+│              📘 Facebook 📩 Telegram│
+│                                     │
+│   Earned this month     ₦4,000     │
+│   Pending                ₦2,000    │
+│   [ Withdraw to wallet ]           │
+│                                     │
+│   Referral History (12)      >     │
+│   Leaderboard                >     │
+│   Terms & Rules               >     │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Business Logic</h4>
+            <ul>
+              <li>Referral code is unique per user, auto-generated at signup, not user-editable (prevents impersonation of vanity codes)</li>
+              <li>Reward moves Pending → Approved only after the referred user completes KYC Tier 2 <em>and</em> their account stays active/non-fraudulent for 7 days (anti-abuse cooling period)</li>
+              <li>Withdraw moves Approved rewards into the main wallet balance instantly; rewards are not a separate withdrawable-to-bank pool</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/referrals/summary</code></td><td>GET — code, link, earned/pending totals</td></tr>
+              <tr><td><code>/v1/referrals/qr</code></td><td>GET — QR image</td></tr>
+              <tr><td><code>/v1/referrals/withdraw</code></td><td>POST</td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Error / Success</h4>
+              <ul>
+                <li>Withdraw with ₦0 approved → button disabled with tooltip "Nothing to withdraw yet"</li>
+                <li>Share sheet fails to open (no supported app) → falls back to generic OS share sheet</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>Self-referral (same device/BVN) detected → reward voided silently, no user-facing shame message, flagged for fraud review</li>
+                <li>Referred user churns/deletes account before 7-day cooling period ends → reward stays Pending indefinitely, never auto-approves</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">referral.link_shared</span><span class="chip">referral.reward_pending</span><span class="chip">referral.reward_approved</span><span class="chip">referral.reward_voided_fraud</span><span class="chip">referral.withdrawn</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen" id="refer-history">
+        <div class="screen-head">
+          <span class="tag">Support · Refer &amp; Earn</span>
+          <h3>Referral History &amp; Leaderboard</h3>
+          <p class="dek">Per-referral status list and an opt-in social leaderboard.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← Referral History ────────────────┐
+│  Aisha B.        Pending    ₦0     │
+│  Tunde O.        Approved   ₦1,000 │
+│  Chidi K.        Signed up  ₦0     │
+│                  (no KYC yet)      │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>States</h4>
+            <p><span class="pill warn">Signed up</span> (no KYC) → <span class="pill warn">Pending</span> (KYC done, cooling) → <span class="pill ok">Approved</span> (paid out) / <span class="pill danger">Voided</span> (fraud).</p>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <p><code>/v1/referrals/history?cursor=</code> GET · <code>/v1/referrals/leaderboard</code> GET (opt-in, defaults off for privacy)</p>
+          </div>
+          <div class="field">
+            <h4>Empty State</h4>
+            <p>"No referrals yet — share your code to start earning" + Share CTA.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="rate">
+      <div class="mod-head"><span class="mod-num">09</span><h2>Rate the App</h2></div>
+      <article class="screen">
+        <div class="screen-head">
+          <span class="tag">Support</span>
+          <h3>Rate the App</h3>
+          <p class="dek">Routes happy users to the store, unhappy users to structured feedback — never both at once.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a product team, we want delighted users to leave a public store review and frustrated users to tell us privately what's wrong, instead of venting in a 1-star review.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌  How's EmirePay working for you?  ┐
+│        ★ ★ ★ ★ ★  (tap to rate)   │
+└─────────────────────────────────────┘
+  4–5★ → native store review prompt
+  1–3★ → "What can we improve?"
+          [ Bug   Suggestion  Other ]
+          [ comment box            ]
+          [ Submit feedback ]</pre>
+          </div>
+          <div class="field">
+            <h4>Business Logic</h4>
+            <ul>
+              <li>4–5 stars triggers the OS-native <code>InAppReview</code> prompt (Google Play / SKStoreReviewController) — never a custom webview, respects OS-imposed prompt frequency caps</li>
+              <li>1–3 stars routes to an internal feedback form instead, tagged bug/suggestion/other, optionally attachable to a support ticket</li>
+              <li>Never prompted more than once per 90 days, and never immediately after a failed transaction (triggered from a calm moment — e.g. after a successful transfer, or manually from More)</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <p><code>/v1/feedback/app-rating</code> POST <code>{stars, category, comment}</code></p>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <ul>
+              <li>OS review API unavailable/quota exhausted → falls back to a plain deep link to the store listing</li>
+              <li>User dismisses native prompt → not treated as negative, no re-prompt attempt this session</li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">rating.submitted</span><span class="chip">rating.feedback_submitted</span></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="about">
+      <div class="mod-head"><span class="mod-num">10</span><h2>About</h2></div>
+      <article class="screen">
+        <div class="screen-head">
+          <span class="tag">Support</span>
+          <h3>About EmirePay</h3>
+          <p class="dek">Company, legal, and version information — mostly static, but version/build must be dynamic for support triage.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌ ← About ────────────────────────────┐
+│         (EmirePay logo)             │
+│         EmirePay v1.0.0 (104)       │
+│                                     │
+│  Privacy Policy               >     │
+│  Terms of Service             >     │
+│  Cookie Policy                 >     │
+│  Open Source Licenses          >     │
+│                                     │
+│  Company Info                  >     │
+│  Website        emirepay.com        │
+│  Contact        support@emirepay... │
+│  Follow us   🐦 📸 📘 💼            │
+└─────────────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Content / API</h4>
+            <ul>
+              <li>Version + build number read from platform package info at runtime (already visible as "EmirePay v1.0.0" on the shipped More screen)</li>
+              <li>Legal documents (<code>/v1/legal/privacy</code>, <code>/terms</code>, <code>/cookies</code>) fetched remotely so they can be updated without an app release; cached with a version stamp so the user is prompted to re-accept on material changes</li>
+              <li>Open Source Licenses uses the platform-native license page (<code>showLicensePage</code> in Flutter) auto-generated from <code>pubspec.lock</code></li>
+            </ul>
+          </div>
+          <div class="field">
+            <h4>Edge Cases</h4>
+            <p>Legal content fetch fails offline → falls back to the last bundled copy shipped with the app binary, with a "showing offline version" note.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mod" id="logout">
+      <div class="mod-head"><span class="mod-num">11</span><h2>Logout</h2></div>
+      <article class="screen">
+        <div class="screen-head">
+          <span class="tag">Session</span>
+          <h3>Logout Flow</h3>
+          <p class="dek">Deliberately two-tap, with an explicit choice between this device and everywhere.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <h4>Purpose &amp; User Story</h4>
+            <p>As a user, I want to sign out of just this phone normally, but have a fast way to sign out everywhere if I suspect my account is compromised.</p>
+          </div>
+          <div class="field">
+            <h4>Screen Layout</h4>
+            <pre class="receipt">┌  Log out of EmirePay?  ┐
+│  You'll need your PIN or   │
+│  password to log back in.  │
+│                             │
+│  [   Log out this device  ]│
+│  [   Log out all devices  ]│
+│  [        Cancel          ]│
+└─────────────────────────────┘</pre>
+          </div>
+          <div class="field">
+            <h4>Business Logic</h4>
+            <ol>
+              <li>Confirm sheet from tapping "Log Out" on More</li>
+              <li>Server invalidates the access/refresh token pair for the chosen scope (this device, or all devices)</li>
+              <li>Client clears in-memory state, cached API responses, and secure-storage tokens</li>
+              <li>Local biometric binding is <em>not</em> removed on a normal logout (kept for fast re-login), but push token is deregistered</li>
+              <li>Redirects to Sign In screen</li>
+            </ol>
+          </div>
+          <div class="field">
+            <h4>API Calls</h4>
+            <table class="spec">
+              <tr><th>Call</th><th>Method</th></tr>
+              <tr><td><code>/v1/auth/logout</code></td><td>POST <code>{scope: "device"|"all"}</code></td></tr>
+            </table>
+          </div>
+          <div class="field-2col">
+            <div class="field">
+              <h4>Loading / Error / Success</h4>
+              <ul>
+                <li><strong>Loading:</strong> buttons show inline spinner, sheet non-dismissible mid-request</li>
+                <li><strong>Error:</strong> network failure → local session is cleared anyway (client always trusts local logout to avoid trapping a user offline), server-side revoke retried in background</li>
+                <li><strong>Success:</strong> immediate redirect to Sign In, no toast (destination is the confirmation)</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Edge Cases</h4>
+              <ul>
+                <li>Logout triggered by the security fraud engine (forced) → same flow, but with a mandatory explanatory screen before Sign In, not a silent bounce</li>
+                <li>Pending unsynced local data (rare, e.g. a queued feedback draft) → discarded on logout, no draft persistence across accounts</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Security Considerations</h4>
+            <p>Refresh tokens are revoked server-side, not just discarded client-side, so a captured token can't be replayed after logout. "Log out all devices" is identical in effect to Security Hub's "Log out other devices" plus this device.</p>
+          </div>
+          <div class="field">
+            <h4>Audit</h4>
+            <div class="chip-row"><span class="chip">auth.logout</span><span class="chip">auth.logout_all</span><span class="chip">auth.forced_logout</span></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <hr class="rule" />
+
+    <section class="mod" id="crosscutting">
+      <div class="mod-head"><span class="mod-num">12</span><h2>Architecture, APIs, QA &amp; PRD</h2></div>
+      <p class="mod-intro">Everything above described a screen in isolation. This section binds the eleven modules into one system: the full tree, the data it shares, the endpoints it calls, and the checklists that gate a release.</p>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">01 · Information Architecture</span><h3>Complete Navigation Tree</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <pre class="receipt">More
+├─ Identity card ─────────────────► Profile Overview
+├─ Account
+│  ├─ Profile ─────────────────────► Profile Overview
+│  │   ├─ Edit Profile
+│  │   │   └─ Verify Email/Phone (OTP, shared)
+│  │   ├─ Profile Picture
+│  │   ├─ BVN Verification (external)
+│  │   └─ NIN Verification (external)
+│  ├─ Security & PIN ───────────────► Security Hub
+│  │   ├─ Change Transaction PIN
+│  │   ├─ Forgot / Reset PIN
+│  │   ├─ Change / Forgot Password
+│  │   ├─ Two-Factor Authentication
+│  │   ├─ Trusted Devices
+│  │   ├─ Login Sessions
+│  │   └─ Security Alerts
+│  └─ Cards & Banks ─────────────────► Cards & Banks Hub
+│      ├─ Add Bank
+│      ├─ Bank Detail (set default / remove)
+│      ├─ Add Card
+│      ├─ Card Detail (freeze / limits / replace / delete)
+│      └─ Transaction Limits
+├─ Preferences
+│  ├─ Notifications ─────────────────► Notification Settings
+│  ├─ Biometric Login ───────────────► Biometric Enrollment
+│  └─ Appearance ────────────────────► Theme (Light/Dark/System)
+├─ Support
+│  ├─ Help Center ───────────────────► Help Center Hub
+│  │   ├─ FAQ / Search
+│  │   ├─ Live Chat / Chatbot
+│  │   ├─ WhatsApp / Phone / Email (external handoff)
+│  │   └─ Raise Ticket → Ticket History → Ticket Detail
+│  ├─ Refer & Earn ──────────────────► Referral Dashboard
+│  │   ├─ Referral History
+│  │   └─ Leaderboard (opt-in)
+│  ├─ Rate the App ──────────────────► Rating sheet
+│  │   └─ (branches) Store review | Internal Feedback
+│  └─ About ─────────────────────────► About screen
+│      ├─ Privacy Policy / Terms / Cookie Policy
+│      └─ Open Source Licenses
+└─ Log Out ──────────────────────────► Logout confirm sheet
+    └─ (branches) This device | All devices</pre>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">02–03 · Journey &amp; Diagrams</span><h3>Signature User Journey — "I Lost My Phone"</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <p>Chosen because it touches nine of the eleven modules and is the highest-stakes path through More.</p>
+            <pre class="receipt">1. New phone → Sign In → Forgot Password (email OTP)
+2. Signed in → Security Hub → risk banner "new device"
+3. → Trusted Devices → remove old phone
+4. → Login Sessions → confirm no unrecognized activity
+5. → Change Transaction PIN → new PIN set
+6. → Two-Factor Authentication → re-enroll TOTP (old backup codes invalidated)
+7. → Biometric Login → enroll on new device
+8. → Cards & Banks → Card Detail → confirm no unfamiliar card
+9. → Help Center → Raise Ticket ("lost device") for the paper trail
+Outcome: account fully re-secured in one continuous flow, no support agent required.</pre>
+          </div>
+          <div class="field">
+            <h4>Mermaid — Journey Flowchart</h4>
+            <pre class="receipt">```mermaid
+flowchart TD
+    A[Sign In] -->|Forgot password| B[Password Reset via Email OTP]
+    B --> C[Security Hub: new-device risk banner]
+    C --> D[Trusted Devices: remove old phone]
+    C --> E[Login Sessions: review history]
+    C --> F[Change Transaction PIN]
+    C --> G[Re-enroll Two-Factor Auth]
+    C --> H[Enroll Biometric on new device]
+    F --> I[Cards & Banks: verify no unfamiliar card]
+    G --> I
+    H --> I
+    I --> J[Raise Ticket: lost device, for the record]
+    J --> K[Account secured]
+```</pre>
+          </div>
+          <div class="field">
+            <h4>Mermaid — PIN Change Sequence</h4>
+            <pre class="receipt">```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as App
+    participant S as Server
+    participant N as Notification Svc
+    U->>A: Enter current PIN
+    A->>S: POST /security/pin/verify
+    S-->>A: 200 OK
+    U->>A: Enter new PIN + confirm
+    A->>S: POST /security/pin/change
+    S->>S: hash, store, invalidate other sessions
+    S->>N: enqueue push+email+SMS alert
+    S-->>A: 200 OK
+    A-->>U: "PIN changed successfully"
+    N-->>U: Push/Email/SMS: "Your PIN was changed"
+```</pre>
+          </div>
+          <div class="field">
+            <h4>Mermaid — Account Lock State Diagram</h4>
+            <pre class="receipt">```mermaid
+stateDiagram-v2
+    [*] --> Active
+    Active --> StepUpRequired: risk score medium
+    StepUpRequired --> Active: OTP+PIN pass
+    StepUpRequired --> SoftHold: risk score high (velocity)
+    SoftHold --> Active: 15 min elapsed, no new flags
+    Active --> ForceLoggedOut: impossible travel
+    ForceLoggedOut --> Active: password reset complete
+    Active --> Locked: repeated PIN failure across devices
+    Locked --> Active: support-verified unlock
+    Locked --> [*]: account closed (unresolved, 90d)
+```</pre>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">08 · API Endpoint List</span><h3>Consolidated API Surface</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <table class="spec">
+              <tr><th>Domain</th><th>Endpoints</th></tr>
+              <tr><td>Profile</td><td><code>GET/PATCH /v1/users/me</code> · <code>GET /v1/users/me/kyc-status</code> · <code>PUT /v1/users/me/next-of-kin</code> · <code>POST/DELETE /v1/users/me/avatar</code> · <code>GET /v1/lookups/states|lgas</code></td></tr>
+              <tr><td>OTP (shared)</td><td><code>POST /v1/otp/send</code> · <code>POST /v1/otp/verify</code></td></tr>
+              <tr><td>Security</td><td><code>GET /v1/security/overview</code> · <code>POST /v1/security/pin/verify|change</code> · <code>POST /v1/security/pin/reset/initiate|complete</code> · <code>POST /v1/auth/password/change|forgot|reset</code> · <code>GET/DELETE /v1/security/devices</code> · <code>POST /v1/security/devices/logout-others</code> · <code>GET /v1/security/login-history</code> · <code>POST /v1/security/2fa/setup|confirm|disable</code> · <code>GET /v1/security/2fa/backup-codes</code> · <code>PUT /v1/security/questions</code> · <code>GET/PATCH /v1/security/alert-preferences</code> · <code>GET /v1/security/fraud-events</code> · <code>POST /v1/security/unlock-request</code></td></tr>
+              <tr><td>Cards &amp; Banks</td><td><code>GET /v1/banks</code> · <code>POST /v1/banks/resolve|link</code> · <code>GET /v1/banks/linked</code> · <code>POST /v1/banks/{id}/set-default</code> · <code>DELETE /v1/banks/{id}</code> · <code>GET /v1/cards</code> · <code>POST /v1/cards/tokenize|verify|verify/complete</code> · <code>POST /v1/cards/{id}/reveal|freeze|unfreeze|replace</code> · <code>PATCH /v1/cards/{id}/limits</code> · <code>DELETE /v1/cards/{id}</code> · <code>GET/PATCH /v1/limits</code> · <code>PATCH /v1/limits/self-imposed</code></td></tr>
+              <tr><td>Preferences</td><td><code>GET/PATCH /v1/notifications/preferences</code> · <code>PUT /v1/devices/push-token</code> · <code>POST /v1/security/biometric/register|disable</code> · <code>PATCH /v1/users/me/preferences</code></td></tr>
+              <tr><td>Support</td><td><code>GET /v1/support/faq</code> · <code>GET /v1/support/channel-status</code> · <code>GET/POST /v1/support/tickets</code> · <code>POST /v1/support/tickets/{id}/messages|escalate|close|rate</code></td></tr>
+              <tr><td>Referrals</td><td><code>GET /v1/referrals/summary|qr|history|leaderboard</code> · <code>POST /v1/referrals/withdraw</code></td></tr>
+              <tr><td>Feedback</td><td><code>POST /v1/feedback/app-rating</code></td></tr>
+              <tr><td>Legal</td><td><code>GET /v1/legal/privacy|terms|cookies</code></td></tr>
+              <tr><td>Auth</td><td><code>POST /v1/auth/logout</code></td></tr>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">09 · Database Schema</span><h3>Core Tables (More Section Scope)</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <pre class="receipt">users(id, first_name, last_name, middle_name, email, email_verified_at,
+      phone, phone_verified_at, dob, gender, nationality, occupation,
+      avatar_url, theme_pref, created_at)
+user_addresses(id, user_id, country, state, lga, street_address, is_primary)
+next_of_kin(id, user_id, full_name, relationship, phone, email, address)
+kyc_records(id, user_id, tier, bvn_status, nin_status, verified_at, provider_ref)
+identity_correction_requests(id, user_id, field, old_value, new_value,
+      document_url, status, reviewed_by, created_at)
+
+user_credentials(user_id, pin_hash, pin_updated_at, pin_fail_count,
+      pin_locked_until, pin_history_hashes[], password_hash, password_updated_at)
+otps(id, user_id, channel, purpose, code_hash, expires_at, attempts, consumed_at)
+user_devices(id, user_id, device_name, platform, push_token, last_ip,
+      last_geo, last_seen_at, trusted_at, revoked_at)
+login_attempts(id, user_id, status, method, ip, geo, device_id,
+      failure_reason, created_at)
+two_factor_settings(user_id, method, secret_encrypted, enabled_at)
+backup_codes(id, user_id, code_hash, used_at)
+security_questions(id, user_id, question, answer_hash)
+fraud_events(id, user_id, rule_code, severity, action_taken, resolved_at)
+
+linked_banks(id, user_id, bank_code, account_number, account_name,
+      is_default, verified_at, created_at)
+linked_cards(id, user_id, processor_token, brand, last4, exp_month,
+      exp_year, is_default, status, daily_limit, created_at)
+transaction_limits(user_id, tier_daily_cap, tier_monthly_cap,
+      self_imposed_daily, self_imposed_updated_at)
+
+notification_preferences(user_id, category, channel, enabled)
+
+support_tickets(id, user_id, category, subject, status, priority,
+      created_at, closed_at)
+ticket_messages(id, ticket_id, sender_type, body, attachment_urls, created_at)
+
+referrals(id, referrer_id, referred_id, status, reward_amount,
+      approved_at, voided_reason)
+referral_codes(user_id, code)
+
+app_ratings(id, user_id, stars, category, comment, created_at)
+audit_log(id, user_id, event, metadata_json, ip, device_id, created_at)</pre>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">10 · Permission Matrix</span><h3>Who Can Do What</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <table class="spec">
+              <tr><th>Action</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th><th>Support Agent</th><th>Compliance</th></tr>
+              <tr><td>View profile</td><td>✓</td><td>✓</td><td>✓</td><td>Read-only (masked)</td><td>✓</td></tr>
+              <tr><td>Edit address / occupation</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>✓</td></tr>
+              <tr><td>Edit legal name / DOB</td><td>Request only</td><td>Request only</td><td>Request only</td><td>—</td><td>Approve</td></tr>
+              <tr><td>Add bank / card</td><td>—</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+              <tr><td>Change PIN / password</td><td>✓</td><td>✓</td><td>✓</td><td>Trigger reset only</td><td>—</td></tr>
+              <tr><td>Raise self-imposed limit</td><td>—</td><td>✓ (24h cool-off)</td><td>✓ (24h cool-off)</td><td>—</td><td>Override</td></tr>
+              <tr><td>Unlock a locked account</td><td>—</td><td>—</td><td>—</td><td>With verification</td><td>✓</td></tr>
+              <tr><td>Approve referral reward</td><td>—</td><td>—</td><td>—</td><td>—</td><td>System-automated, Compliance can void</td></tr>
+              <tr><td>Send money / withdraw</td><td>Up to Tier-1 cap</td><td>Up to Tier-2 cap</td><td>Up to Tier-3 cap</td><td>—</td><td>Can freeze</td></tr>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">11 · Security Checklist</span><h3>FinTech Security Checklist</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <ul>
+              <li>☑ PCI-DSS SAQ-A scope maintained — raw PAN/CVV never touch app backend, tokenized client-side</li>
+              <li>☑ PIN/password hashed with Argon2id, per-user salt, never logged in plaintext anywhere (app logs, crash reports, analytics)</li>
+              <li>☑ All destructive/high-value actions require step-up auth (PIN or biometric), not just a confirm dialog</li>
+              <li>☑ Rate limiting + progressive lockout on PIN, password, and OTP attempts</li>
+              <li>☑ OTPs are purpose-bound, single-use, short-TTL, and rate-limited per user and per device/IP</li>
+              <li>☑ Refresh tokens revoked server-side on logout, not just discarded client-side</li>
+              <li>☑ Sensitive screens (PIN entry, card reveal, security hub) block screenshots/screen-recording</li>
+              <li>☑ Anti-enumeration on forgot-password/forgot-email flows (identical response whether account exists or not)</li>
+              <li>☑ Biometric match is on-device only; server never receives raw biometric data</li>
+              <li>☑ Every credential/limit/device change fires a real-time alert on a channel the attacker doesn't control (i.e. not just in-app)</li>
+              <li>☑ Full audit trail (who, what, when, from where) for every mutating endpoint in this document</li>
+              <li>☑ AML controls: bank-name match on linking, self-referral fraud detection, KYC-tiered limits enforced server-side (never trust client-sent limits)</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">12–14 · UX, Accessibility &amp; Mobile Guidelines</span><h3>Craft Standards</h3></div>
+        <div class="field-grid">
+          <div class="field-2col">
+            <div class="field">
+              <h4>UX Best Practices</h4>
+              <ul>
+                <li>Never make a user re-enter data lost to a background/interrupt (draft state persists locally)</li>
+                <li>Every irreversible action gets a confirm step that names the consequence, not a generic "Are you sure?"</li>
+                <li>Toasts confirm state changes; full-screen success only for flows the user waited on (OTP, card verify)</li>
+                <li>Errors are written in plain language with a next step, never a raw error code alone</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Accessibility Checklist</h4>
+              <ul>
+                <li>☑ All tap targets ≥ 44×44dp; PIN keypad keys ≥ 48dp</li>
+                <li>☑ Color is never the only status signal (icon + text pairs every pill/badge)</li>
+                <li>☑ Screen reader labels on every icon-only button (copy, freeze, remove)</li>
+                <li>☑ Minimum 4.5:1 text contrast in both themes; verified against the token palette above</li>
+                <li>☑ Form errors announced via live region, not just visual inline text</li>
+                <li>☑ Biometric flows always offer a fully accessible PIN fallback path</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>Mobile Design Guidelines</h4>
+            <ul>
+              <li>Destructive actions bottom-sheet on mobile (thumb-reachable), never a top-anchored modal</li>
+              <li>Numeric keypads (PIN, OTP, card number) use the platform-native numeric keyboard, not a custom one, except the randomized-layout security keypad</li>
+              <li>Sticky primary actions (Save, Submit) stay above the keyboard inset on all form screens</li>
+              <li>Pull-to-refresh on every list/detail screen backed by a GET (Overview, Devices, Sessions, Tickets, Referral History)</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">15 · QA Test Cases</span><h3>Representative Test Matrix</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <table class="spec">
+              <tr><th>#</th><th>Scenario</th><th>Expected Result</th></tr>
+              <tr><td>TC-01</td><td>Change PIN with correct current PIN, valid new PIN</td><td>Success toast, other sessions logged out, alert sent</td></tr>
+              <tr><td>TC-02</td><td>Change PIN, 3× wrong current PIN</td><td>PIN locked 30 min, routed toward Forgot PIN</td></tr>
+              <tr><td>TC-03</td><td>Add bank where resolved name ≠ profile name</td><td>Hard block, explainer shown, no bank linked</td></tr>
+              <tr><td>TC-04</td><td>Remove the only linked bank</td><td>Blocked with explanatory message</td></tr>
+              <tr><td>TC-05</td><td>Add card, 3DS declined by issuer</td><td>Plain-language decline reason, card not saved</td></tr>
+              <tr><td>TC-06</td><td>Freeze a card, attempt a transaction on it</td><td>Transaction declined at authorization</td></tr>
+              <tr><td>TC-07</td><td>Enable 2FA, lose device, no backup codes saved</td><td>No in-app bypass; routed to Help Center identity recovery</td></tr>
+              <tr><td>TC-08</td><td>Referral: same BVN refers itself via second account</td><td>Reward auto-voided, fraud event logged, no user-facing penalty message</td></tr>
+              <tr><td>TC-09</td><td>Logout while offline</td><td>Local session cleared immediately; server revoke retried on reconnect</td></tr>
+              <tr><td>TC-10</td><td>Lower self-imposed daily limit mid-day, then attempt to raise it back</td><td>Lower applies instantly; raise enforces 24h cool-off</td></tr>
+              <tr><td>TC-11</td><td>Theme set to "System" with device in dark mode, backgrounded, switched to light</td><td>App reflects light mode on next foreground, no mid-session flash</td></tr>
+              <tr><td>TC-12</td><td>Support ticket auto-close after 5 days idle on Resolved</td><td>Ticket moves to Closed, reopenable within 30 days</td></tr>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">16–18 · Requirements &amp; PRD Summary</span><h3>Functional / Non-Functional Requirements</h3></div>
+        <div class="field-grid">
+          <div class="field-2col">
+            <div class="field">
+              <h4>Functional Requirements (sample)</h4>
+              <ul>
+                <li>FR-1 Users must be able to view and edit non-immutable profile fields</li>
+                <li>FR-2 Legal name/DOB changes must route through a compliance-reviewed correction request</li>
+                <li>FR-3 Transaction PIN and login password must be independently changeable</li>
+                <li>FR-4 Every bank/card link must be ownership-verified before use</li>
+                <li>FR-5 Notification preferences must be settable per category and per channel, with security/transaction alerts non-disableable</li>
+                <li>FR-6 Users must be able to see and revoke access from any device</li>
+              </ul>
+            </div>
+            <div class="field">
+              <h4>Non-Functional Requirements</h4>
+              <ul>
+                <li>NFR-1 P95 API latency &lt; 400ms for all GET endpoints in this module</li>
+                <li>NFR-2 99.9% availability for auth/security endpoints (PIN, password, OTP)</li>
+                <li>NFR-3 All PII at rest encrypted (AES-256); secrets in a managed KMS, not app config</li>
+                <li>NFR-4 Full audit log retained ≥ 7 years (NDPR/CBN record-keeping)</li>
+                <li>NFR-5 Offline-tolerant reads (last-known-good cache) for Profile Overview and About</li>
+              </ul>
+            </div>
+          </div>
+          <div class="field">
+            <h4>PRD Summary</h4>
+            <p><strong>Problem:</strong> the More section is currently a static menu with no destinations. <strong>Goal:</strong> ship the eleven screens above so users can self-serve identity management, security hardening, payment-instrument control, and support — without contacting an agent for anything that doesn't require human judgment. <strong>Success metric:</strong> support ticket volume for "how do I…" categories drops ≥ 40% within one quarter of launch; self-serve PIN/password reset completion rate ≥ 90%.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">19 · Developer Handoff</span><h3>Handoff Notes</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <ul>
+              <li>Existing scaffolding already matches this IA — see <code>lib/screens/{profile,security,cards_banks,notifications,help,refer,rate,about}/</code>; wire these specs into the existing screen files rather than restructuring folders</li>
+              <li>OTP Verification, PIN Confirm Sheet, and Device Row are reusable widgets — build once, consume from Profile, Security, and Cards &amp; Banks</li>
+              <li>All monetary values render via the existing <code>lib/utils/formatters.dart</code> pattern for consistency with Home/History</li>
+              <li>Every mutating call needs an <code>Idempotency-Key</code> header — critical for PIN change, card actions, and referral withdrawal given mobile networks retry silently</li>
+              <li>Ship the notification preferences matrix as v1 (category-level + channel-level, not fully crossed); flag the crossed matrix as a fast-follow, not launch-blocking</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen">
+        <div class="screen-head"><span class="tag">20 · Roadmap</span><h3>Future Features</h3></div>
+        <div class="field-grid">
+          <div class="field">
+            <table class="spec">
+              <tr><th>Horizon</th><th>Feature</th></tr>
+              <tr><td>Next quarter</td><td>Passkey/WebAuthn login alongside biometric; per-category × per-channel notification matrix</td></tr>
+              <tr><td>Next quarter</td><td>In-app card PIN change for physical cards (currently issuer-side only)</td></tr>
+              <tr><td>6–12 months</td><td>Family/joint accounts with delegated permissions (extends the Permission Matrix above)</td></tr>
+              <tr><td>6–12 months</td><td>Referral tiers/streaks with a public opt-in leaderboard reward multiplier</td></tr>
+              <tr><td>12+ months</td><td>Self-serve dispute/chargeback filing directly from a transaction, feeding into Help Center tickets</td></tr>
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="doc-end">EmirePay — More Section Specification · v1.0 · Prepared for design, engineering, and QA handoff.</footer>
+  </main>
+</div>

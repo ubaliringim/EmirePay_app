@@ -1,0 +1,26 @@
+name = "emirepay-vtpass-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "emirepay-transactions"
+database_id = "05feb66e-520c-47c4-a155-f9403dad986b"
+migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "PROFILE_PHOTOS"
+id = "d7b1bd4db9d246189455f4a4f67c5aa9"
+
+[vars]
+# Non-secret config. Replace with your real Firebase project ID
+# (Firebase Console -> Project Settings -> Project ID).
+FIREBASE_PROJECT_ID = "emirepay-prod"
+
+# VTpass sandbox base URL. Switch to https://vtpass.com/api when you move to production.
+VTPASS_BASE_URL = "https://sandbox.vtpass.com/api"
+
+# Secrets (set via `npm run secret:vtpass-api-key` / `npm run secret:vtpass-secret-key`,
+# never committed to this file):
+#   VTPASS_API_KEY
+#   VTPASS_SECRET_KEY

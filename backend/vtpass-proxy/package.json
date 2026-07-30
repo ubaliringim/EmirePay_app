@@ -1,0 +1,19 @@
+{
+  "name": "vtpass-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "secret:vtpass-api-key": "wrangler secret put VTPASS_API_KEY",
+    "secret:vtpass-secret-key": "wrangler secret put VTPASS_SECRET_KEY"
+  },
+  "devDependencies": {
+    "wrangler": "^4.4.0",
+    "typescript": "^5.5.0",
+    "@cloudflare/workers-types": "^5.0.0"
+  },
+  "dependencies": {
+    "jose": "^5.9.0"
+  }
+}
