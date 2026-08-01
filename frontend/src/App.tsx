@@ -1,0 +1,56 @@
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Landing } from "./routes/index";
+import { LogIn } from "./routes/login";
+import { SignUp } from "./routes/signup";
+import { AppLayout } from "./routes/app";
+import { Dashboard } from "./routes/app.index";
+import { PurchasePage } from "./routes/app.purchase";
+import { TransactionsPage } from "./routes/app.transactions";
+import { SettingsPage } from "./routes/app.settings";
+import { Toaster } from "@/components/ui/sonner";
+
+function RootLayout() {
+  return (
+    <div className="min-h-screen bg-canvas-soft">
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<LogIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/app" element={<AppLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="purchase" element={<PurchasePage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Toaster position="top-center" richColors />
+    </div>
+  );
+}
+
+function NotFound() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The page you are looking for does not exist or has been moved.
+        </p>
+        <div className="mt-6">
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Go home
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  return <RootLayout />;
+}

@@ -1,0 +1,169 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@source "../src";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Emir Pay design system — adapted from the supplied Wise-inspired spec.
+ * All colors are oklch semantic tokens. Never hardcode colors in components.
+ */
+
+@theme inline {
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-3xl: 40px;
+
+  --font-display: "Archivo", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-active: var(--primary-active);
+  --color-primary-neutral: var(--primary-neutral);
+  --color-primary-pale: var(--primary-pale);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ink: var(--ink);
+  --color-ink-deep: var(--ink-deep);
+  --color-body: var(--body-text);
+  --color-mute: var(--mute);
+  --color-canvas: var(--canvas);
+  --color-canvas-soft: var(--canvas-soft);
+  --color-positive: var(--positive);
+  --color-positive-deep: var(--positive-deep);
+  --color-warning: var(--warning);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-cyan: var(--accent-cyan);
+
+  --shadow-card:
+    0 1px 2px oklch(0.166 0.006 122.1 / 0.04), 0 12px 32px oklch(0.166 0.006 122.1 / 0.06);
+  --shadow-lift: 0 18px 50px oklch(0.166 0.006 122.1 / 0.12);
+}
+
+:root {
+  --radius: 24px;
+
+  --primary: oklch(0.957 0.068 153.4);
+  --primary-foreground: oklch(0.166 0.006 122.1);
+  --primary-active: oklch(0.915 0.089 153.7);
+  --primary-neutral: oklch(0.896 0.067 158);
+  --primary-pale: oklch(0.961 0.023 157.6);
+  --secondary: oklch(0.487 0.1 150.2);
+  --secondary-foreground: oklch(1 0 89.9);
+  --ink: oklch(0.166 0.006 122.1);
+  --ink-deep: oklch(0.287 0.084 135.1);
+  --body-text: oklch(0.395 0.004 145.5);
+  --mute: oklch(0.62 0.001 106.4);
+  --canvas: oklch(1 0 89.9);
+  --canvas-soft: oklch(0.936 0.007 132.4);
+  --positive: oklch(0.658 0.176 147);
+  --positive-deep: oklch(0.37 0.091 153.7);
+  --warning: oklch(0.875 0.175 92.2);
+  --accent-orange: oklch(0.854 0.095 57.8);
+  --accent-cyan: oklch(0.782 0.14 229.1);
+
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--canvas);
+  --card-foreground: var(--ink);
+  --popover: var(--canvas);
+  --popover-foreground: var(--ink);
+  --muted: var(--canvas-soft);
+  --muted-foreground: var(--body-text);
+  --accent: var(--primary-pale);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.566 0.194 24.2);
+  --destructive-foreground: oklch(1 0 89.9);
+  --border: oklch(0.888 0.008 132.4);
+  --input: oklch(0.888 0.008 132.4);
+  --ring: var(--secondary);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-body);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    letter-spacing: -0.02em;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 112px;
+  }
+}
+
+@utility display-mega {
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+}
+
+@utility section-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1200px;
+  padding-inline: 20px;
+}
+
+@utility surface-card {
+  background-color: var(--color-canvas);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+@utility field-input {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  padding: 12px 16px;
+  font-size: 16px;
+  line-height: 24px;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+@utility field-input {
+  &:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px var(--color-primary-pale);
+  }
+  &::placeholder {
+    color: var(--color-mute);
+  }
+}
