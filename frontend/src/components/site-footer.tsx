@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { Wordmark } from "@/components/wordmark";
+import logoWhiteBg from "@/assets/logowhitebg.png";
 
 const socials = [Facebook, Instagram, Twitter, Linkedin];
 
@@ -8,7 +9,7 @@ export function SiteFooter() {
     <footer className="bg-ink text-canvas-soft">
       <div className="section-shell grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1.2fr]">
         <div className="space-y-4">
-          <Wordmark tone="light" />
+          <Wordmark tone="light" src={logoWhiteBg} />
           <p className="max-w-sm text-sm text-canvas-soft/70">
             Fast, secure and affordable digital payments for individuals, businesses, agents and
             developers across Nigeria.

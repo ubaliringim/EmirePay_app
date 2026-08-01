@@ -8,10 +8,10 @@ export function LogIn() {
   return (
     <div className="min-h-screen bg-canvas-soft flex items-center justify-center px-5">
       <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
-          <Wordmark />
-        </div>
         <div className="surface-card p-7 sm:p-9">
+          <div className="mb-6 flex justify-center">
+            <Wordmark />
+          </div>
           <p className="text-sm font-bold tracking-widest text-secondary uppercase">Log in</p>
           <h1 className="mt-2 text-3xl font-black">Welcome back</h1>
           <p className="mt-2 text-sm text-body">

@@ -4,14 +4,16 @@ import logo from "@/assets/logo.png";
 
 export function Wordmark({
   tone = "ink",
+  src = logo,
   className,
 }: {
   tone?: "ink" | "light";
+  src?: string;
   className?: string;
 }) {
   return (
     <Link to="/" className={cn("inline-flex items-center", className)} aria-label="Emir Pay home">
-      <img src={logo} alt="Emir Pay" className="h-8 w-auto" />
+      <img src={src} alt="Emir Pay" className="h-8 w-auto" />
     </Link>
   );
 }

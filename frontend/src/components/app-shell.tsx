@@ -11,6 +11,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { Wordmark } from "@/components/wordmark";
+import logoWhiteBg from "@/assets/logowhitebg.png";
 import { useWallet } from "@/lib/wallet-store";
 import { cn } from "@/lib/utils";
 import { ActionButton } from "@/components/ui-kit";
@@ -82,7 +83,7 @@ export function AppShell({
     <div className="min-h-screen bg-canvas-soft lg:grid lg:grid-cols-[264px_1fr]">
       <aside className="sticky top-0 hidden h-screen flex-col justify-between bg-ink p-6 lg:flex">
         <div>
-          <Wordmark tone="light" />
+          <Wordmark tone="light" src={logoWhiteBg} />
           <div className="mt-10">{navList()}</div>
         </div>
         <div className="space-y-4">
@@ -167,7 +168,7 @@ export function AppShell({
           <div className="absolute inset-y-0 left-0 flex w-72 flex-col justify-between bg-ink p-6">
             <div>
               <div className="flex items-center justify-between">
-                <Wordmark tone="light" />
+                <Wordmark tone="light" src={logoWhiteBg} />
                 <button
                   type="button"
                   onClick={() => setDrawer(false)}
