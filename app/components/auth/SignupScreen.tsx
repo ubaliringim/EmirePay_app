@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { User, Mail, Phone, Lock } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Input } from '../ui';
-import { Colors, Spacing, Rounded } from '../../constants/colors';
+import { Colors, Spacing } from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
+import { AuthCard } from './AuthCard';
 
 interface SignupScreenProps {
   onNavigateToLogin: () => void;
@@ -12,6 +13,7 @@ interface SignupScreenProps {
 }
 
 export function SignupScreen({ onNavigateToLogin, onAuthSuccess }: SignupScreenProps) {
+  const insets = useSafeAreaInsets();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -53,15 +55,15 @@ export function SignupScreen({ onNavigateToLogin, onAuthSuccess }: SignupScreenP
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + Spacing['3xl'] }]}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.header}>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Join Emir Pay today</Text>
-          </View>
-
-          <View style={styles.form}>
+          <AuthCard
+            eyebrow="Sign Up"
+            title="Create your account"
+            subtitle="It takes under a minute to start paying bills with Emir Pay."
+          >
             <Input
               label="Full Name"
               placeholder="Enter your full name"
@@ -76,6 +78,7 @@ export function SignupScreen({ onNavigateToLogin, onAuthSuccess }: SignupScreenP
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              autoCapitalize="none"
               error={errors.email}
             />
             <Input
@@ -113,7 +116,8 @@ export function SignupScreen({ onNavigateToLogin, onAuthSuccess }: SignupScreenP
                 {acceptTerms && <Text style={styles.checkmark}>✓</Text>}
               </View>
               <Text style={styles.termsText}>
-                I accept the <Text style={styles.termsLink}>Terms & Conditions</Text>
+                I agree to the <Text style={styles.termsLink}>Terms & Conditions</Text> and{' '}
+                <Text style={styles.termsLink}>Privacy Policy</Text>
               </Text>
             </TouchableOpacity>
             {errors.terms && <Text style={styles.errorText}>{errors.terms}</Text>}
@@ -131,7 +135,7 @@ export function SignupScreen({ onNavigateToLogin, onAuthSuccess }: SignupScreenP
                 <Text style={styles.loginLink}>Log In</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </AuthCard>
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -147,57 +151,41 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing['3xl'],
-    paddingBottom: Spacing['2xl'],
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: Spacing['2xl'],
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: Colors.ink,
-    marginBottom: Spacing.xs,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.body,
-  },
-  form: {
-    backgroundColor: Colors.canvas,
-    borderRadius: Rounded.xl,
-    padding: Spacing.xl,
+    paddingVertical: Spacing['3xl'],
   },
   termsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.xl,
+    alignItems: 'flex-start',
+    marginBottom: Spacing.lg,
   },
   checkbox: {
     width: 20,
     height: 20,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: Colors.ink,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
     marginRight: Spacing.sm,
+    marginTop: 2,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Colors.canvas,
   },
   checkboxChecked: {
-    backgroundColor: Colors.secondary,
-    borderColor: Colors.secondary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.ink,
   },
   checkmark: {
-    color: Colors.canvas,
+    color: Colors.ink,
     fontSize: 12,
     fontWeight: '700',
   },
   termsText: {
-    fontSize: 14,
+    fontSize: 13,
     color: Colors.body,
     flex: 1,
+    lineHeight: 18,
   },
   termsLink: {
     color: Colors.secondary,
@@ -211,6 +199,7 @@ const styles = StyleSheet.create({
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    flexWrap: 'wrap',
     marginTop: Spacing.xl,
   },
   loginText: {

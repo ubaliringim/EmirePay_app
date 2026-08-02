@@ -1,14 +1,16 @@
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Colors, Rounded, Spacing } from '../../constants/colors';
+import type { ReactNode } from 'react';
+import { Colors, Rounded, Spacing, Shadows } from '../../constants/colors';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'dark' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
+  icon?: ReactNode;
 }
 
 export function Button({
@@ -19,6 +21,7 @@ export function Button({
   disabled = false,
   loading = false,
   fullWidth = false,
+  icon,
 }: ButtonProps) {
   const getVariantStyles = () => {
     switch (variant) {
@@ -26,8 +29,12 @@ export function Button({
         return { backgroundColor: Colors.primary };
       case 'secondary':
         return { backgroundColor: Colors.secondary };
-      case 'tertiary':
+      case 'dark':
+        return { backgroundColor: Colors.ink };
+      case 'outline':
         return { backgroundColor: Colors.canvas, borderWidth: 1, borderColor: Colors.ink };
+      case 'ghost':
+        return { backgroundColor: 'transparent' };
       case 'danger':
         return { backgroundColor: Colors.negative };
       default:
@@ -38,13 +45,15 @@ export function Button({
   const getTextColor = () => {
     switch (variant) {
       case 'primary':
+      case 'ghost':
         return Colors.ink;
       case 'secondary':
-        return Colors.canvas;
-      case 'tertiary':
-        return Colors.ink;
       case 'danger':
         return Colors.canvas;
+      case 'dark':
+        return Colors.primary;
+      case 'outline':
+        return Colors.ink;
       default:
         return Colors.ink;
     }
@@ -69,6 +78,7 @@ export function Button({
         getSizeStyles(),
         fullWidth && styles.fullWidth,
         disabled && styles.disabled,
+        (variant === 'primary' || variant === 'dark') && Shadows.card,
       ]}
       onPress={onPress}
       disabled={disabled || loading}
@@ -77,7 +87,10 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={getTextColor()} size="small" />
       ) : (
-        <Text style={[styles.text, { color: getTextColor() }]}>{title}</Text>
+        <>
+          {icon}
+          <Text style={[styles.text, { color: getTextColor() }]}>{title}</Text>
+        </>
       )}
     </TouchableOpacity>
   );
@@ -85,7 +98,7 @@ export function Button({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: Rounded.xl,
+    borderRadius: Rounded.lg,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',

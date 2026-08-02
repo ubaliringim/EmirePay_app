@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
-import { User, Mail, Phone, Lock, Bell, Moon, HelpCircle, LogOut, ChevronRight, Copy, Check } from 'lucide-react-native';
+import { User, Mail, Phone, Lock, Bell, HelpCircle, LogOut, ChevronRight, Copy, Check } from 'lucide-react-native';
 import { Button, Input, Card, BottomSheet } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
-import { formatCurrency } from '../../data/mockData';
 
 interface SettingsScreenProps {
   onLogout: () => void;
@@ -17,18 +16,25 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [copied, setCopied] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
     email: user?.email || '',
     phone: user?.phone || '',
   });
-  
+
   const [passwordData, setPasswordData] = useState({
     current: '',
     new: '',
     confirm: '',
   });
+
+  const initials = (user?.fullName || '')
+    .split(' ')
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
   const handleSave = () => {
     updateProfile(formData);
@@ -57,8 +63,8 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
 
   const handleLogout = () => {
     Alert.alert(
-      'Log Out',
-      'Are you sure you want to log out?',
+      'Log out of Emir Pay?',
+      "You'll need to sign in again to access your wallet.",
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Log Out', style: 'destructive', onPress: onLogout },
@@ -71,6 +77,17 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Profile</Text>
         <Card padding="lg">
+          {!editing && (
+            <View style={styles.profileHeader}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{initials}</Text>
+              </View>
+              <View style={styles.profileHeaderInfo}>
+                <Text style={styles.profileName}>{user?.fullName}</Text>
+                <Text style={styles.profileEmail}>{user?.email}</Text>
+              </View>
+            </View>
+          )}
           {editing ? (
             <>
               <Input
@@ -92,7 +109,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
               />
               <View style={styles.editActions}>
                 <Button title="Save Changes" onPress={handleSave} size="sm" />
-                <Button title="Cancel" variant="tertiary" onPress={() => setEditing(false)} size="sm" />
+                <Button title="Cancel" variant="outline" onPress={() => setEditing(false)} size="sm" />
               </View>
             </>
           ) : (
@@ -138,10 +155,13 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
           <View style={styles.accountCard}>
             <View>
               <Text style={styles.accountLabel}>Virtual Account</Text>
-              <Text style={styles.accountNumber}>{user?.virtualAccountNumber} • {user?.virtualAccountBank}</Text>
+              <Text style={styles.accountNumber}>{user?.virtualAccountNumber}</Text>
+              <Text style={styles.accountBank}>
+                {user?.virtualAccountBank} · {user?.fullName}
+              </Text>
             </View>
             <TouchableOpacity style={styles.copyButton} onPress={handleCopyAccount}>
-              {copied ? <Check size={16} color={Colors.secondary} /> : <Copy size={16} color={Colors.secondary} />}
+              {copied ? <Check size={16} color={Colors.positive} /> : <Copy size={16} color={Colors.ink} />}
             </TouchableOpacity>
           </View>
         </Card>
@@ -171,8 +191,8 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: Colors.canvasSoft, true: Colors.primary }}
-              thumbColor={notificationsEnabled ? Colors.secondary : Colors.mute}
+              trackColor={{ false: Colors.border, true: Colors.primaryNeutral }}
+              thumbColor={notificationsEnabled ? Colors.secondary : Colors.canvas}
             />
           </View>
           <View style={styles.divider} />
@@ -184,8 +204,8 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
             <Switch
               value={emailNotifications}
               onValueChange={setEmailNotifications}
-              trackColor={{ false: Colors.canvasSoft, true: Colors.primary }}
-              thumbColor={emailNotifications ? Colors.secondary : Colors.mute}
+              trackColor={{ false: Colors.border, true: Colors.primaryNeutral }}
+              thumbColor={emailNotifications ? Colors.secondary : Colors.canvas}
             />
           </View>
         </Card>
@@ -223,7 +243,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
           />
           <Input
             label="New Password"
-            placeholder="Enter new password"
+            placeholder="At least 6 characters"
             value={passwordData.new}
             onChangeText={(v) => setPasswordData({ ...passwordData, new: v })}
             secureTextEntry
@@ -231,13 +251,13 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
           />
           <Input
             label="Confirm New Password"
-            placeholder="Confirm new password"
+            placeholder="Repeat new password"
             value={passwordData.confirm}
             onChangeText={(v) => setPasswordData({ ...passwordData, confirm: v })}
             secureTextEntry
             showPasswordToggle
           />
-          <Button title="Change Password" onPress={handleChangePassword} fullWidth />
+          <Button title="Change Password" variant="dark" onPress={handleChangePassword} fullWidth />
         </View>
       </BottomSheet>
     </ScrollView>
@@ -255,9 +275,49 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
+    fontFamily: 'Archivo_800ExtraBold',
     color: Colors.ink,
+    letterSpacing: -0.36,
     marginBottom: Spacing.md,
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: Spacing.lg,
+    marginBottom: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.lg,
+  },
+  avatarText: {
+    fontSize: 20,
+    fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
+    color: Colors.ink,
+  },
+  profileHeaderInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: '800',
+    fontFamily: 'Archivo_800ExtraBold',
+    color: Colors.ink,
+    letterSpacing: -0.36,
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: Colors.body,
+    marginTop: Spacing.xxs,
   },
   profileItem: {
     flexDirection: 'row',
@@ -288,7 +348,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.canvasSoft,
+    backgroundColor: Colors.border,
     marginVertical: Spacing.sm,
   },
   editActions: {
@@ -307,9 +367,16 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xxs,
   },
   accountNumber: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
     color: Colors.ink,
+    letterSpacing: -0.4,
+  },
+  accountBank: {
+    fontSize: 12,
+    color: Colors.body,
+    marginTop: Spacing.xs,
   },
   copyButton: {
     padding: Spacing.sm,
@@ -339,6 +406,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.canvas,
+    borderWidth: 1,
+    borderColor: Colors.negative,
     padding: Spacing.lg,
     borderRadius: Rounded.xl,
     marginBottom: Spacing['3xl'],

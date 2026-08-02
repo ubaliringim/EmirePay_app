@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Smartphone, Wifi, Zap, Tv, Banknote, GraduationCap } from 'lucide-react-native';
+import { Smartphone, Wifi, Zap, Tv, Repeat, GraduationCap } from 'lucide-react-native';
+import { Card } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
 import { SERVICE_TYPES } from '../../constants/services';
 
@@ -8,7 +9,7 @@ const ICON_MAP: Record<string, any> = {
   Wifi,
   Zap,
   Tv,
-  Banknote,
+  Repeat,
   GraduationCap,
 };
 
@@ -20,8 +21,8 @@ export function QuickServicesGrid({ onServicePress }: QuickServicesGridProps) {
   const services = Object.values(SERVICE_TYPES);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Quick Services</Text>
+    <Card padding="lg">
+      <Text style={styles.sectionTitle}>Services</Text>
       <View style={styles.grid}>
         {services.map((service) => {
           const IconComponent = ICON_MAP[service.icon];
@@ -32,28 +33,27 @@ export function QuickServicesGrid({ onServicePress }: QuickServicesGridProps) {
               onPress={() => onServicePress(service.id)}
               activeOpacity={0.8}
             >
-              <View style={[styles.iconContainer, { backgroundColor: service.color + '20' }]}>
-                <IconComponent size={24} color={service.color} />
+              <View style={[styles.iconContainer, { backgroundColor: service.bg }]}>
+                <IconComponent size={20} color={service.color} />
               </View>
-              <Text style={styles.serviceName} numberOfLines={1}>
+              <Text style={styles.serviceName} numberOfLines={2}>
                 {service.name}
               </Text>
             </TouchableOpacity>
           );
         })}
       </View>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: Spacing.xl,
-  },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
     color: Colors.ink,
+    letterSpacing: -0.32,
     marginBottom: Spacing.lg,
   },
   grid: {
@@ -65,20 +65,21 @@ const styles = StyleSheet.create({
     width: '33.333%',
     alignItems: 'center',
     paddingHorizontal: Spacing.xs,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
   iconContainer: {
-    width: 56,
-    height: 56,
+    width: 44,
+    height: 44,
     borderRadius: Rounded.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.sm,
   },
   serviceName: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: '600',
     color: Colors.ink,
     textAlign: 'center',
+    lineHeight: 16,
   },
 });

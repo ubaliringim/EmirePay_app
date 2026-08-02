@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { Smartphone, Wifi, Zap, Tv, Banknote, GraduationCap } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Smartphone, Wifi, Zap, Tv, Repeat, GraduationCap } from 'lucide-react-native';
+import { Card } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
 import { SERVICE_TYPES } from '../../constants/services';
 
@@ -8,7 +9,7 @@ const ICON_MAP: Record<string, any> = {
   Wifi,
   Zap,
   Tv,
-  Banknote,
+  Repeat,
   GraduationCap,
 };
 
@@ -21,79 +22,72 @@ export function ServiceSelector({ selectedService, onServiceSelect }: ServiceSel
   const services = Object.values(SERVICE_TYPES);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Select Service</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={styles.servicesRow}>
-          {services.map((service) => {
-            const IconComponent = ICON_MAP[service.icon];
-            const isSelected = selectedService === service.id;
-            
-            return (
-              <TouchableOpacity
-                key={service.id}
-                style={[styles.serviceCard, isSelected && styles.serviceCardSelected]}
-                onPress={() => onServiceSelect(service.id)}
-                activeOpacity={0.8}
+    <Card padding="lg">
+      <Text style={styles.title}>Choose a Service</Text>
+      <View style={styles.grid}>
+        {services.map((service) => {
+          const IconComponent = ICON_MAP[service.icon];
+          const isSelected = selectedService === service.id;
+
+          return (
+            <TouchableOpacity
+              key={service.id}
+              style={[styles.serviceCard, isSelected && styles.serviceCardSelected]}
+              onPress={() => onServiceSelect(service.id)}
+              activeOpacity={0.8}
+            >
+              <IconComponent size={20} color={isSelected ? Colors.ink : service.color} />
+              <Text
+                style={[styles.serviceName, isSelected && styles.serviceNameSelected]}
+                numberOfLines={2}
               >
-                <View style={[styles.iconContainer, { backgroundColor: service.color + '20' }]}>
-                  <IconComponent size={28} color={service.color} />
-                </View>
-                <Text style={[styles.serviceName, isSelected && styles.serviceNameSelected]}>
-                  {service.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
-    </View>
+                {service.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: Spacing.xl,
-  },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
     color: Colors.ink,
+    letterSpacing: -0.32,
     marginBottom: Spacing.lg,
   },
-  servicesRow: {
+  grid: {
     flexDirection: 'row',
-    gap: Spacing.md,
-    paddingHorizontal: Spacing.sm,
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
   },
   serviceCard: {
-    width: 100,
+    width: '30.9%',
     alignItems: 'center',
-    padding: Spacing.lg,
-    backgroundColor: Colors.canvas,
+    gap: Spacing.sm,
+    padding: Spacing.md,
     borderRadius: Rounded.xl,
-    borderWidth: 2,
-    borderColor: Colors.canvasSoft,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.canvas,
   },
   serviceCardSelected: {
-    borderColor: Colors.secondary,
-    backgroundColor: Colors.primaryPale,
-  },
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: Rounded.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
+    borderColor: Colors.ink,
+    backgroundColor: Colors.primary,
   },
   serviceName: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: Colors.ink,
+    color: Colors.body,
     textAlign: 'center',
+    lineHeight: 15,
   },
   serviceNameSelected: {
-    color: Colors.secondary,
+    color: Colors.ink,
+    fontWeight: '700',
   },
 });

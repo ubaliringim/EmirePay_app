@@ -1,4 +1,5 @@
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { SettingsScreen } from '../../components/settings';
 import { Colors } from '../../constants/colors';
@@ -14,9 +15,9 @@ export default function SettingsTab() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView edges={['top']} style={styles.container}>
       <SettingsScreen onLogout={handleLogout} />
-    </View>
+    </SafeAreaView>
   );
 }
 

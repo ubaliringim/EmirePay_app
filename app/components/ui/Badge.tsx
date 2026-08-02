@@ -10,11 +10,11 @@ export function Badge({ text, variant = 'neutral' }: BadgeProps) {
   const getVariantStyles = () => {
     switch (variant) {
       case 'positive':
-        return { backgroundColor: Colors.primaryPale, textColor: Colors.positiveDeep };
+        return { backgroundColor: Colors.primary, textColor: Colors.ink };
       case 'negative':
-        return { backgroundColor: Colors.negativeBg, textColor: Colors.canvas };
+        return { backgroundColor: Colors.negative + '1f', textColor: Colors.negative };
       case 'warning':
-        return { backgroundColor: Colors.warning, textColor: Colors.warningContent };
+        return { backgroundColor: Colors.warning + '4d', textColor: Colors.ink };
       default:
         return { backgroundColor: Colors.canvasSoft, textColor: Colors.body };
     }
@@ -32,13 +32,15 @@ export function Badge({ text, variant = 'neutral' }: BadgeProps) {
 const badgeStyles = StyleSheet.create({
   badge: {
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
+    paddingVertical: Spacing.xxs,
     borderRadius: Rounded.pill,
     alignSelf: 'flex-start',
   },
   text: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     lineHeight: 16,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
 });

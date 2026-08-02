@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import { Smartphone, Wifi, Zap, Tv, GraduationCap, Wallet, ChevronRight } from 'lucide-react-native';
+import { Smartphone, Wifi, Zap, Tv, GraduationCap, Repeat, Wallet, ArrowRight } from 'lucide-react-native';
 import { Card, Badge } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
@@ -11,6 +11,7 @@ const ICON_MAP: Record<string, any> = {
   Electricity: Zap,
   'Cable TV': Tv,
   'Education PIN': GraduationCap,
+  'Airtime to Cash': Repeat,
   'Wallet Funding': Wallet,
 };
 
@@ -45,12 +46,12 @@ export function RecentTransactions({ onViewAll, onTransactionPress }: RecentTran
         activeOpacity={0.7}
       >
         <View style={styles.transactionIcon}>
-          <IconComponent size={20} color={Colors.ink} />
+          <IconComponent size={18} color={Colors.ink} />
         </View>
         <View style={styles.transactionInfo}>
-          <Text style={styles.transactionType}>{item.type}</Text>
-          <Text style={styles.transactionRecipient} numberOfLines={1}>
-            {item.recipient}
+          <Text style={styles.transactionType} numberOfLines={1}>{item.type}</Text>
+          <Text style={styles.transactionMeta} numberOfLines={1}>
+            {item.recipient} · {formatDate(item.date).split(',')[0]}
           </Text>
         </View>
         <View style={styles.transactionRight}>
@@ -64,45 +65,43 @@ export function RecentTransactions({ onViewAll, onTransactionPress }: RecentTran
   };
 
   return (
-    <View style={styles.container}>
+    <Card padding="lg">
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>Recent Transactions</Text>
         <TouchableOpacity onPress={onViewAll} style={styles.viewAllButton}>
-          <Text style={styles.viewAllText}>View All</Text>
-          <ChevronRight size={16} color={Colors.secondary} />
+          <Text style={styles.viewAllText}>View all</Text>
+          <ArrowRight size={14} color={Colors.secondary} />
         </TouchableOpacity>
       </View>
-      <Card padding="sm">
-        <FlatList
-          data={recentTransactions}
-          renderItem={renderTransaction}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
-      </Card>
-    </View>
+      <FlatList
+        data={recentTransactions}
+        renderItem={renderTransaction}
+        keyExtractor={(item) => item.id}
+        scrollEnabled={false}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: Spacing.xl,
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
+    color: Colors.ink,
+    letterSpacing: -0.32,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.ink,
+    marginBottom: Spacing.sm,
   },
   viewAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   viewAllText: {
     fontSize: 14,
@@ -117,7 +116,7 @@ const styles = StyleSheet.create({
   transactionIcon: {
     width: 40,
     height: 40,
-    borderRadius: Rounded.md,
+    borderRadius: Rounded.full,
     backgroundColor: Colors.canvasSoft,
     justifyContent: 'center',
     alignItems: 'center',
@@ -132,9 +131,9 @@ const styles = StyleSheet.create({
     color: Colors.ink,
     marginBottom: Spacing.xxs,
   },
-  transactionRecipient: {
+  transactionMeta: {
     fontSize: 12,
-    color: Colors.mute,
+    color: Colors.body,
   },
   transactionRight: {
     alignItems: 'flex-end',
@@ -143,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: Colors.ink,
-    marginBottom: Spacing.xxs,
+    marginBottom: Spacing.xs,
   },
   creditAmount: {
     color: Colors.positive,

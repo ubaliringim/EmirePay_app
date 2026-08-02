@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { SplashScreen, OnboardingScreen, LoginScreen, SignupScreen, ForgotPasswordScreen } from '../components/auth';
+import { SplashScreen, LoginScreen, SignupScreen, ForgotPasswordScreen } from '../components/auth';
 import { useRouter } from 'expo-router';
 
-type AuthStep = 'splash' | 'onboarding' | 'login' | 'signup' | 'forgotPassword';
+type AuthStep = 'splash' | 'login' | 'signup' | 'forgotPassword';
 
 export default function AuthFlow() {
   const [step, setStep] = useState<AuthStep>('splash');
@@ -16,9 +16,7 @@ export default function AuthFlow() {
   const renderStep = () => {
     switch (step) {
       case 'splash':
-        return <SplashScreen onFinish={() => setStep('onboarding')} />;
-      case 'onboarding':
-        return <OnboardingScreen onComplete={() => setStep('login')} />;
+        return <SplashScreen onFinish={() => setStep('login')} />;
       case 'login':
         return (
           <LoginScreen

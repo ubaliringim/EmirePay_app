@@ -13,7 +13,7 @@ export const generateTransactions = (count: number) => {
     status: faker.helpers.arrayElement(statuses),
     date: faker.date.recent({ days: 30 }).toISOString(),
     recipient: faker.helpers.arrayElement([
-      faker.phone.number('080########'),
+      faker.string.numeric('080########'),
       faker.string.alphanumeric(10).toUpperCase(),
       faker.person.fullName(),
     ]),

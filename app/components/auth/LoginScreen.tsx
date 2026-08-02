@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Mail, Lock } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Input } from '../ui';
-import { Colors, Spacing, Rounded } from '../../constants/colors';
+import { Colors, Spacing } from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
+import { AuthCard } from './AuthCard';
 
 interface LoginScreenProps {
   onNavigateToSignup: () => void;
@@ -13,6 +14,7 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onNavigateToSignup, onNavigateToForgotPassword, onAuthSuccess }: LoginScreenProps) {
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -45,26 +47,22 @@ export function LoginScreen({ onNavigateToSignup, onNavigateToForgotPassword, on
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + Spacing['3xl'] }]}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <View style={styles.logo}>
-                <Mail size={32} color={Colors.ink} />
-              </View>
-            </View>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to continue to Emir Pay</Text>
-          </View>
-
-          <View style={styles.form}>
+          <AuthCard
+            eyebrow="Log In"
+            title="Welcome back"
+            subtitle="Sign in to your Emir Pay wallet to continue."
+          >
             <Input
               label="Email Address"
               placeholder="Enter your email"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              autoCapitalize="none"
               error={errors.email}
             />
             <Input
@@ -77,7 +75,7 @@ export function LoginScreen({ onNavigateToSignup, onNavigateToForgotPassword, on
               error={errors.password}
             />
 
-            <TouchableOpacity onPress={onNavigateToForgotPassword}>
+            <TouchableOpacity onPress={onNavigateToForgotPassword} style={styles.forgotWrapper}>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
             </TouchableOpacity>
 
@@ -95,12 +93,12 @@ export function LoginScreen({ onNavigateToSignup, onNavigateToForgotPassword, on
             </View>
 
             <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
+              <Text style={styles.signupText}>New to Emir Pay? </Text>
               <TouchableOpacity onPress={onNavigateToSignup}>
-                <Text style={styles.signupLink}>Sign Up</Text>
+                <Text style={styles.signupLink}>Create an account</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </AuthCard>
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -116,46 +114,18 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing['3xl'],
-    paddingBottom: Spacing['2xl'],
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: Spacing['3xl'],
-  },
-  logoContainer: {
-    marginBottom: Spacing.xl,
-  },
-  logo: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: Colors.primary,
     justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing['3xl'],
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: Colors.ink,
-    marginBottom: Spacing.xs,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.body,
-  },
-  form: {
-    backgroundColor: Colors.canvas,
-    borderRadius: Rounded.xl,
-    padding: Spacing.xl,
+  forgotWrapper: {
+    alignSelf: 'flex-end',
+    marginBottom: Spacing.xl,
   },
   forgotPassword: {
     fontSize: 14,
     fontWeight: '600',
     color: Colors.secondary,
-    textAlign: 'right',
-    marginBottom: Spacing.xl,
   },
   divider: {
     flexDirection: 'row',
@@ -165,18 +135,19 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: Colors.canvasSoft,
+    backgroundColor: Colors.border,
   },
   dividerText: {
     marginHorizontal: Spacing.lg,
-    fontSize: 14,
+    fontSize: 13,
     color: Colors.mute,
-    fontWeight: '500',
+    fontWeight: '600',
+    letterSpacing: 1,
   },
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: Spacing.lg,
+    flexWrap: 'wrap',
   },
   signupText: {
     fontSize: 14,

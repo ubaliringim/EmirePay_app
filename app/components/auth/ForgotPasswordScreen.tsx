@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Mail, Key, CheckCircle } from 'lucide-react-native';
 import { Button, Input } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
+import { AuthCard } from './AuthCard';
 
 interface ForgotPasswordScreenProps {
   onBack: () => void;
@@ -11,7 +13,14 @@ interface ForgotPasswordScreenProps {
 
 type Step = 'email' | 'otp' | 'reset' | 'success';
 
+const STEP_META: Record<Exclude<Step, 'success'>, { icon: any; eyebrow: string }> = {
+  email: { icon: Mail, eyebrow: 'Password' },
+  otp: { icon: Key, eyebrow: 'Verify' },
+  reset: { icon: Key, eyebrow: 'Reset' },
+};
+
 export function ForgotPasswordScreen({ onBack }: ForgotPasswordScreenProps) {
+  const insets = useSafeAreaInsets();
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -87,19 +96,13 @@ export function ForgotPasswordScreen({ onBack }: ForgotPasswordScreenProps) {
       case 'email':
         return (
           <>
-            <View style={styles.iconContainer}>
-              <Mail size={32} color={Colors.ink} />
-            </View>
-            <Text style={styles.title}>Forgot Password?</Text>
-            <Text style={styles.subtitle}>
-              Enter your email address and we'll send you a code to reset your password.
-            </Text>
             <Input
               label="Email Address"
               placeholder="Enter your email"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              autoCapitalize="none"
               error={errors.email}
             />
           </>
@@ -107,12 +110,8 @@ export function ForgotPasswordScreen({ onBack }: ForgotPasswordScreenProps) {
       case 'otp':
         return (
           <>
-            <View style={styles.iconContainer}>
-              <Key size={32} color={Colors.ink} />
-            </View>
-            <Text style={styles.title}>Enter OTP</Text>
-            <Text style={styles.subtitle}>
-              We sent a 6-digit code to {email}. Enter it below.
+            <Text style={styles.hint}>
+              We sent a 6-digit code to {email}
             </Text>
             <Input
               label="OTP Code"
@@ -127,13 +126,6 @@ export function ForgotPasswordScreen({ onBack }: ForgotPasswordScreenProps) {
       case 'reset':
         return (
           <>
-            <View style={styles.iconContainer}>
-              <Key size={32} color={Colors.ink} />
-            </View>
-            <Text style={styles.title}>Reset Password</Text>
-            <Text style={styles.subtitle}>
-              Create a new password for your account.
-            </Text>
             <Input
               label="New Password"
               placeholder="Enter new password"
@@ -155,20 +147,60 @@ export function ForgotPasswordScreen({ onBack }: ForgotPasswordScreenProps) {
           </>
         );
       case 'success':
-        return (
-          <>
-            <View style={[styles.iconContainer, { backgroundColor: Colors.primaryPale }]}>
-              <CheckCircle size={32} color={Colors.positive} />
-            </View>
-            <Text style={styles.title}>Password Reset!</Text>
-            <Text style={styles.subtitle}>
-              Your password has been successfully reset. You can now log in with your new password.
-            </Text>
-            <Button title="Back to Login" onPress={onBack} fullWidth />
-          </>
-        );
+        return null;
     }
   };
+
+  const getTitle = () => {
+    switch (step) {
+      case 'email': return 'Forgot Password?';
+      case 'otp': return 'Enter OTP';
+      case 'reset': return 'Reset Password';
+      case 'success': return 'Password Reset!';
+    }
+  };
+
+  const getSubtitle = () => {
+    switch (step) {
+      case 'email':
+        return "Enter your email address and we'll send you a code to reset your password.";
+      case 'otp':
+        return 'Enter the code we sent to your email.';
+      case 'reset':
+        return 'Create a new password for your account.';
+      case 'success':
+        return 'Your password has been successfully reset. You can now log in with your new password.';
+    }
+  };
+
+  if (step === 'success') {
+    return (
+      <LinearGradient
+        colors={[Colors.canvasSoft, Colors.primaryPale]}
+        style={styles.container}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+        >
+          <ScrollView
+            contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + Spacing['3xl'] }]}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <AuthCard eyebrow="Done" title={getTitle()} subtitle={getSubtitle()}>
+              <View style={styles.successIcon}>
+                <CheckCircle size={40} color={Colors.ink} />
+              </View>
+              <Button title="Back to Login" onPress={onBack} fullWidth />
+            </AuthCard>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </LinearGradient>
+    );
+  }
+
+  const meta = STEP_META[step];
 
   return (
     <LinearGradient
@@ -180,26 +212,26 @@ export function ForgotPasswordScreen({ onBack }: ForgotPasswordScreenProps) {
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + Spacing['3xl'] }]}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          {step !== 'success' && (
-            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-              <ArrowLeft size={24} color={Colors.ink} />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <ArrowLeft size={22} color={Colors.ink} />
+          </TouchableOpacity>
 
-          <View style={styles.form}>
+          <AuthCard eyebrow={meta.eyebrow} title={getTitle()} subtitle={getSubtitle()}>
+            <View style={styles.stepIcon}>
+              <meta.icon size={32} color={Colors.ink} />
+            </View>
             {renderContent()}
-            {step !== 'success' && (
-              <Button
-                title={step === 'reset' ? 'Reset Password' : 'Continue'}
-                onPress={handleNext}
-                fullWidth
-                loading={isLoading}
-              />
-            )}
-          </View>
+            <Button
+              title={step === 'reset' ? 'Reset Password' : 'Continue'}
+              onPress={handleNext}
+              fullWidth
+              loading={isLoading}
+            />
+          </AuthCard>
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -215,9 +247,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing['3xl'],
-    paddingBottom: Spacing['2xl'],
+    paddingVertical: Spacing['3xl'],
   },
   backButton: {
     width: 48,
@@ -226,35 +258,33 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.canvas,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
+    alignSelf: 'flex-start',
   },
-  form: {
-    backgroundColor: Colors.canvas,
-    borderRadius: Rounded.xl,
-    padding: Spacing.xl,
-    alignItems: 'center',
-  },
-  iconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+  stepIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: Rounded.lg,
     backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
     marginBottom: Spacing.xl,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: Colors.ink,
-    textAlign: 'center',
-    marginBottom: Spacing.sm,
-  },
-  subtitle: {
+  hint: {
     fontSize: 14,
     color: Colors.body,
     textAlign: 'center',
-    marginBottom: Spacing['2xl'],
-    lineHeight: 20,
+    marginBottom: Spacing.lg,
+  },
+  successIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: Spacing.xl,
   },
 });

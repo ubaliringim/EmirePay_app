@@ -1,5 +1,6 @@
 import { Modal, View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import { X } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Rounded, Spacing } from '../../constants/colors';
 
 interface BottomSheetProps {
@@ -10,6 +11,8 @@ interface BottomSheetProps {
 }
 
 export function BottomSheet({ visible, onClose, title, children }: BottomSheetProps) {
+  const insets = useSafeAreaInsets();
+
   return (
     <Modal
       visible={visible}
@@ -19,7 +22,10 @@ export function BottomSheet({ visible, onClose, title, children }: BottomSheetPr
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         <View style={styles.container}>
-          <Pressable style={styles.content} onPress={() => {}}>
+          <Pressable
+            style={[styles.content, { paddingBottom: Math.max(insets.bottom, Spacing['3xl']) }]}
+            onPress={() => {}}
+          >
             <View style={styles.handle} />
             {title && (
               <View style={styles.header}>
@@ -55,8 +61,8 @@ const styles = StyleSheet.create({
   },
   content: {
     backgroundColor: Colors.canvas,
-    borderTopLeftRadius: Rounded.xl,
-    borderTopRightRadius: Rounded.xl,
+    borderTopLeftRadius: Rounded['3xl'],
+    borderTopRightRadius: Rounded['3xl'],
     paddingBottom: Spacing['3xl'],
     maxHeight: '90%',
   },

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { ChevronDown, Check } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { ChevronDown, Check, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react-native';
 import { Button, Input, Card, BottomSheet } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
 import { NETWORK_PROVIDERS, DATA_PLANS, ELECTRICITY_DISCOS, CABLE_PROVIDERS, CABLE_PACKAGES, EXAM_BODIES } from '../../constants/services';
-import { formatCurrency } from '../../data/mockData';
+import { formatCurrency, formatDate } from '../../data/mockData';
 import { useUserStore } from '../../store/userStore';
 
 interface PurchaseFormProps {
@@ -12,11 +12,32 @@ interface PurchaseFormProps {
   onComplete: () => void;
 }
 
+const TITLES: Record<string, string> = {
+  airtime: 'Buy Airtime',
+  data: 'Buy Data',
+  electricity: 'Pay Electricity Bill',
+  cable: 'Renew Cable TV',
+  airtimeToCash: 'Convert Airtime to Cash',
+  education: 'Buy Educational PIN',
+};
+
+const PAYOUT_OPTIONS = [
+  { id: 'zenith', name: 'Zenith Bank •••• 7741' },
+  { id: 'gtbank', name: 'GTBank •••• 2093' },
+  { id: 'wallet', name: 'Emir Pay Wallet' },
+];
+
+const providerName = (id: string) => NETWORK_PROVIDERS.find((n) => n.id === id)?.name || '';
+const discoName = (id: string) => ELECTRICITY_DISCOS.find((d) => d.id === id)?.name || '';
+const cableName = (id: string) => CABLE_PROVIDERS.find((c) => c.id === id)?.name || '';
+const examName = (id: string) => EXAM_BODIES.find((e) => e.id === id)?.name || '';
+
 export function PurchaseForm({ serviceType, onComplete }: PurchaseFormProps) {
   const { user, updateBalance, addTransaction } = useUserStore();
-  const [step, setStep] = useState<'form' | 'review' | 'processing' | 'success'>('form');
+  const [step, setStep] = useState<'form' | 'review' | 'processing' | 'done'>('form');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [error, setError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     network: '',
     phone: '',
@@ -24,89 +45,96 @@ export function PurchaseForm({ serviceType, onComplete }: PurchaseFormProps) {
     dataPlan: '',
     disco: '',
     meterNumber: '',
-    meterType: 'prepaid',
+    meterType: '',
     cableProvider: '',
     smartCardNumber: '',
     cablePackage: '',
     examBody: '',
     quantity: '1',
+    email: '',
+    payout: '',
   });
 
   const [showPicker, setShowPicker] = useState<string | null>(null);
 
   const updateForm = (key: string, value: string) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+    setFormData((prev) => ({ ...prev, [key]: value }));
     setShowPicker(null);
+    setError(null);
   };
 
-  const validateForm = () => {
+  const requiredFields = (): { name: string; label: string }[] => {
     switch (serviceType) {
       case 'airtime':
-        return formData.network && formData.phone && formData.amount;
+        return [
+          { name: 'network', label: 'network provider' },
+          { name: 'phone', label: 'phone number' },
+          { name: 'amount', label: 'amount' },
+        ];
       case 'data':
-        return formData.network && formData.phone && formData.dataPlan;
+        return [
+          { name: 'network', label: 'network provider' },
+          { name: 'phone', label: 'phone number' },
+          { name: 'dataPlan', label: 'data plan' },
+        ];
       case 'electricity':
-        return formData.disco && formData.meterNumber && formData.meterType && formData.amount;
+        return [
+          { name: 'disco', label: 'distribution company' },
+          { name: 'meterNumber', label: 'meter number' },
+          { name: 'meterType', label: 'meter type' },
+          { name: 'amount', label: 'amount' },
+        ];
       case 'cable':
-        return formData.cableProvider && formData.smartCardNumber && formData.cablePackage;
+        return [
+          { name: 'cableProvider', label: 'provider' },
+          { name: 'smartCardNumber', label: 'smartcard / IUC number' },
+          { name: 'cablePackage', label: 'bouquet' },
+        ];
       case 'airtimeToCash':
-        return formData.network && formData.phone && formData.amount;
+        return [
+          { name: 'network', label: 'network' },
+          { name: 'phone', label: 'airtime sender line' },
+          { name: 'amount', label: 'airtime value' },
+          { name: 'payout', label: 'payout account' },
+        ];
       case 'education':
-        return formData.examBody && formData.quantity;
+        return [
+          { name: 'examBody', label: 'exam body' },
+          { name: 'email', label: 'delivery email' },
+        ];
       default:
-        return false;
+        return [];
     }
+  };
+
+  const validateForm = (): string | null => {
+    for (const f of requiredFields()) {
+      if (!formData[f.name as keyof typeof formData]) {
+        return `Please provide ${f.label}.`;
+      }
+    }
+    if (getAmount() <= 0) return 'Enter a valid amount.';
+    return null;
   };
 
   const getAmount = () => {
     switch (serviceType) {
-      case 'data':
-        const plan = DATA_PLANS.find(p => p.id === formData.dataPlan);
+      case 'data': {
+        const plan = DATA_PLANS.find((p) => p.id === formData.dataPlan);
         return plan?.price || 0;
-      case 'cable':
+      }
+      case 'cable': {
         const packages = CABLE_PACKAGES[formData.cableProvider as keyof typeof CABLE_PACKAGES] || [];
-        const pkg = packages.find(p => p.id === formData.cablePackage);
+        const pkg = packages.find((p) => p.id === formData.cablePackage);
         return pkg?.price || 0;
-      case 'education':
-        const exam = EXAM_BODIES.find(e => e.id === formData.examBody);
-        return (exam?.price || 0) * parseInt(formData.quantity || '1');
+      }
+      case 'education': {
+        const exam = EXAM_BODIES.find((e) => e.id === formData.examBody);
+        return (exam?.price || 0) * Math.max(1, parseInt(formData.quantity || '1'));
+      }
       default:
         return parseFloat(formData.amount) || 0;
     }
-  };
-
-  const handleContinue = () => {
-    if (validateForm()) {
-      setStep('review');
-    }
-  };
-
-  const handleConfirm = async () => {
-    const amount = getAmount();
-    
-    if (amount > (user?.walletBalance || 0)) {
-      Alert.alert('Insufficient Balance', 'Please fund your wallet to complete this transaction.');
-      return;
-    }
-
-    setIsLoading(true);
-    setStep('processing');
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    updateBalance(amount, 'subtract');
-    addTransaction({
-      id: `TXN${Date.now()}`,
-      type: getServiceName(),
-      amount: amount,
-      status: 'Successful',
-      date: new Date().toISOString(),
-      recipient: formData.phone || formData.meterNumber || formData.smartCardNumber || 'N/A',
-      reference: `REF${Date.now()}`,
-    });
-    
-    setIsLoading(false);
-    setStep('success');
   };
 
   const getServiceName = () => {
@@ -121,157 +149,244 @@ export function PurchaseForm({ serviceType, onComplete }: PurchaseFormProps) {
     }
   };
 
+  const getSummary = () => {
+    switch (serviceType) {
+      case 'airtime':
+        return `${providerName(formData.network)} Airtime Top-up`;
+      case 'data': {
+        const plan = DATA_PLANS.find((p) => p.id === formData.dataPlan);
+        return `${providerName(formData.network)} ${plan?.size || ''} · ${plan?.duration || ''}`;
+      }
+      case 'electricity':
+        return `${discoName(formData.disco)} · ${formData.meterType === 'postpaid' ? 'Postpaid' : 'Prepaid'}`;
+      case 'cable': {
+        const packages = CABLE_PACKAGES[formData.cableProvider as keyof typeof CABLE_PACKAGES] || [];
+        const pkg = packages.find((p) => p.id === formData.cablePackage);
+        return `${cableName(formData.cableProvider)} ${pkg?.name || ''} renewal`;
+      }
+      case 'airtimeToCash':
+        return `${providerName(formData.network)} airtime converted`;
+      case 'education':
+        return `${examName(formData.examBody)} ×${formData.quantity || 1}`;
+      default:
+        return getServiceName();
+    }
+  };
+
+  const getReviewItems = (): { label: string; value: string }[] => {
+    switch (serviceType) {
+      case 'airtime':
+        return [
+          { label: 'Network provider', value: providerName(formData.network) },
+          { label: 'Phone number', value: formData.phone },
+          { label: 'Amount', value: formatCurrency(getAmount()) },
+        ];
+      case 'data':
+        return [
+          { label: 'Network provider', value: providerName(formData.network) },
+          { label: 'Phone number', value: formData.phone },
+          { label: 'Data plan', value: formData.dataPlan ? `${DATA_PLANS.find((p) => p.id === formData.dataPlan)?.size} · ${DATA_PLANS.find((p) => p.id === formData.dataPlan)?.duration}` : '—' },
+        ];
+      case 'electricity':
+        return [
+          { label: 'Distribution company', value: discoName(formData.disco) },
+          { label: 'Meter number', value: formData.meterNumber },
+          { label: 'Meter type', value: formData.meterType === 'postpaid' ? 'Postpaid' : 'Prepaid' },
+          { label: 'Amount', value: formatCurrency(getAmount()) },
+        ];
+      case 'cable':
+        return [
+          { label: 'Provider', value: cableName(formData.cableProvider) },
+          { label: 'Smartcard / IUC number', value: formData.smartCardNumber },
+          { label: 'Bouquet', value: formData.cablePackage ? CABLE_PACKAGES[formData.cableProvider as keyof typeof CABLE_PACKAGES]?.find((p) => p.id === formData.cablePackage)?.name || '' : '—' },
+        ];
+      case 'airtimeToCash':
+        return [
+          { label: 'Network', value: providerName(formData.network) },
+          { label: 'Airtime sender line', value: formData.phone },
+          { label: 'Airtime value', value: formatCurrency(getAmount()) },
+          { label: 'Payout account', value: PAYOUT_OPTIONS.find((p) => p.id === formData.payout)?.name || '—' },
+        ];
+      case 'education':
+        return [
+          { label: 'Exam body', value: examName(formData.examBody) },
+          { label: 'Quantity', value: formData.quantity || '1' },
+          { label: 'Delivery email', value: formData.email },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const handleContinue = () => {
+    const err = validateForm();
+    setError(err);
+    if (!err) setStep('review');
+  };
+
+  const handleConfirm = async () => {
+    const amount = getAmount();
+
+    if (amount > (user?.walletBalance || 0)) {
+      setError('Insufficient wallet balance. Fund your wallet to complete this payment.');
+      setStep('form');
+      return;
+    }
+
+    setIsLoading(true);
+    setStep('processing');
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    updateBalance(amount, 'subtract');
+    addTransaction({
+      id: `TXN${Date.now()}`,
+      type: getServiceName(),
+      amount: amount,
+      status: 'Successful',
+      date: new Date().toISOString(),
+      recipient: formData.phone || formData.meterNumber || formData.smartCardNumber || formData.email || formData.payout || '—',
+      reference: `REF${Date.now()}`,
+    });
+
+    setIsLoading(false);
+    setStep('done');
+  };
+
+  const renderSelectField = (label: string, pickerKey: string, value: string, placeholder: string) => (
+    <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker(pickerKey)}>
+      <Text style={styles.selectLabel}>{label}</Text>
+      <View style={styles.selectValue}>
+        <Text style={value ? styles.selectValueText : styles.selectPlaceholder}>
+          {value || placeholder}
+        </Text>
+        <ChevronDown size={20} color={Colors.mute} />
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderNetworkField = (label: string) => (
+    <View style={styles.selectField}>
+      <Text style={styles.selectLabel}>{label}</Text>
+      <View style={styles.networkRow}>
+        {NETWORK_PROVIDERS.map((network) => {
+          const active = formData.network === network.id;
+          return (
+            <TouchableOpacity
+              key={network.id}
+              style={[styles.networkTile, active && styles.networkTileActive]}
+              onPress={() => updateForm('network', network.id)}
+              activeOpacity={0.8}
+            >
+              {network.logo ? (
+                <Image source={network.logo} style={styles.networkLogo} resizeMode="contain" />
+              ) : (
+                <Text style={styles.networkFallback}>{network.name.charAt(0)}</Text>
+              )}
+              <Text style={[styles.networkName, active && styles.networkNameActive]}>
+                {network.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+
+  const renderAmountField = (label: string, presets: number[]) => (
+    <>
+      <Input
+        label={label}
+        placeholder="1000"
+        value={formData.amount}
+        onChangeText={(v) => updateForm('amount', v)}
+        keyboardType="numeric"
+      />
+      <View style={styles.presets}>
+        {presets.map((amt) => {
+          const active = formData.amount === String(amt);
+          return (
+            <TouchableOpacity
+              key={amt}
+              style={[styles.presetButton, active && styles.presetActive]}
+              onPress={() => updateForm('amount', amt.toString())}
+            >
+              <Text style={[styles.presetText, active && styles.presetTextActive]}>
+                {formatCurrency(amt)}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </>
+  );
+
   const renderFormFields = () => {
     switch (serviceType) {
       case 'airtime':
         return (
           <>
-            <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('network')}>
-              <Text style={styles.selectLabel}>Network Provider</Text>
-              <View style={styles.selectValue}>
-                <Text style={formData.network ? styles.selectValueText : styles.selectPlaceholder}>
-                  {formData.network ? NETWORK_PROVIDERS.find(n => n.id === formData.network)?.name : 'Select network'}
-                </Text>
-                <ChevronDown size={20} color={Colors.mute} />
-              </View>
-            </TouchableOpacity>
+            {renderNetworkField('Network provider')}
             <Input
-              label="Phone Number"
-              placeholder="e.g. 08012345678"
+              label="Phone number"
+              placeholder="0803 000 0000"
               value={formData.phone}
               onChangeText={(v) => updateForm('phone', v)}
               keyboardType="phone-pad"
             />
-            <Input
-              label="Amount"
-              placeholder="Enter amount"
-              value={formData.amount}
-              onChangeText={(v) => updateForm('amount', v)}
-              keyboardType="numeric"
-            />
-            <View style={styles.presets}>
-              {[100, 200, 500, 1000].map(amt => (
-                <TouchableOpacity
-                  key={amt}
-                  style={styles.presetButton}
-                  onPress={() => updateForm('amount', amt.toString())}
-                >
-                  <Text style={styles.presetText}>₦{amt}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            {renderAmountField('Amount', [100, 200, 500, 1000, 2000, 5000])}
           </>
         );
 
       case 'data':
         return (
           <>
-            <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('network')}>
-              <Text style={styles.selectLabel}>Network Provider</Text>
-              <View style={styles.selectValue}>
-                <Text style={formData.network ? styles.selectValueText : styles.selectPlaceholder}>
-                  {formData.network ? NETWORK_PROVIDERS.find(n => n.id === formData.network)?.name : 'Select network'}
-                </Text>
-                <ChevronDown size={20} color={Colors.mute} />
-              </View>
-            </TouchableOpacity>
+            {renderNetworkField('Network provider')}
             <Input
-              label="Phone Number"
-              placeholder="e.g. 08012345678"
+              label="Phone number"
+              placeholder="0803 000 0000"
               value={formData.phone}
               onChangeText={(v) => updateForm('phone', v)}
               keyboardType="phone-pad"
             />
-            <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('dataPlan')}>
-              <Text style={styles.selectLabel}>Data Plan</Text>
-              <View style={styles.selectValue}>
-                <Text style={formData.dataPlan ? styles.selectValueText : styles.selectPlaceholder}>
-                  {formData.dataPlan ? DATA_PLANS.find(p => p.id === formData.dataPlan)?.size : 'Select plan'}
-                </Text>
-                <ChevronDown size={20} color={Colors.mute} />
-              </View>
-            </TouchableOpacity>
+            {renderSelectField('Data plan', 'dataPlan', formData.dataPlan ? `${DATA_PLANS.find((p) => p.id === formData.dataPlan)?.size} · ${DATA_PLANS.find((p) => p.id === formData.dataPlan)?.duration}` : '', 'Select data plan')}
           </>
         );
 
       case 'electricity':
         return (
           <>
-            <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('disco')}>
-              <Text style={styles.selectLabel}>Electricity Disco</Text>
-              <View style={styles.selectValue}>
-                <Text style={formData.disco ? styles.selectValueText : styles.selectPlaceholder}>
-                  {formData.disco ? ELECTRICITY_DISCOS.find(d => d.id === formData.disco)?.name : 'Select disco'}
-                </Text>
-                <ChevronDown size={20} color={Colors.mute} />
-              </View>
-            </TouchableOpacity>
+            {renderSelectField('Distribution company', 'disco', discoName(formData.disco), 'Select distribution company')}
             <Input
-              label="Meter Number"
-              placeholder="Enter meter number"
+              label="Meter number"
+              placeholder="45012299871"
               value={formData.meterNumber}
               onChangeText={(v) => updateForm('meterNumber', v)}
               keyboardType="numeric"
             />
-            <View style={styles.meterTypeContainer}>
-              <TouchableOpacity
-                style={[styles.meterTypeButton, formData.meterType === 'prepaid' && styles.meterTypeActive]}
-                onPress={() => updateForm('meterType', 'prepaid')}
-              >
-                <Text style={[styles.meterTypeText, formData.meterType === 'prepaid' && styles.meterTypeTextActive]}>
-                  Prepaid
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.meterTypeButton, formData.meterType === 'postpaid' && styles.meterTypeActive]}
-                onPress={() => updateForm('meterType', 'postpaid')}
-              >
-                <Text style={[styles.meterTypeText, formData.meterType === 'postpaid' && styles.meterTypeTextActive]}>
-                  Postpaid
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <Input
-              label="Amount"
-              placeholder="Enter amount"
-              value={formData.amount}
-              onChangeText={(v) => updateForm('amount', v)}
-              keyboardType="numeric"
-            />
+            {renderSelectField('Meter type', 'meterType', formData.meterType ? (formData.meterType === 'postpaid' ? 'Postpaid' : 'Prepaid') : '', 'Select meter type')}
+            {renderAmountField('Amount', [1000, 2000, 5000, 10000])}
           </>
         );
 
       case 'cable':
         return (
           <>
-            <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('cableProvider')}>
-              <Text style={styles.selectLabel}>Cable Provider</Text>
-              <View style={styles.selectValue}>
-                <Text style={formData.cableProvider ? styles.selectValueText : styles.selectPlaceholder}>
-                  {formData.cableProvider ? CABLE_PROVIDERS.find(c => c.id === formData.cableProvider)?.name : 'Select provider'}
-                </Text>
-                <ChevronDown size={20} color={Colors.mute} />
-              </View>
-            </TouchableOpacity>
+            {renderSelectField('Provider', 'cableProvider', cableName(formData.cableProvider), 'Select provider')}
             <Input
-              label="Smart Card/IUC Number"
-              placeholder="Enter smart card number"
+              label="Smartcard / IUC number"
+              placeholder="7012994412"
               value={formData.smartCardNumber}
               onChangeText={(v) => updateForm('smartCardNumber', v)}
               keyboardType="numeric"
             />
-            {formData.cableProvider && (
-              <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('cablePackage')}>
-                <Text style={styles.selectLabel}>Package</Text>
-                <View style={styles.selectValue}>
-                  <Text style={formData.cablePackage ? styles.selectValueText : styles.selectPlaceholder}>
-                    {formData.cablePackage 
-                      ? CABLE_PACKAGES[formData.cableProvider as keyof typeof CABLE_PACKAGES]?.find(p => p.id === formData.cablePackage)?.name 
-                      : 'Select package'}
-                  </Text>
-                  <ChevronDown size={20} color={Colors.mute} />
-                </View>
-              </TouchableOpacity>
+            {renderSelectField(
+              'Bouquet',
+              'cablePackage',
+              formData.cablePackage
+                ? CABLE_PACKAGES[formData.cableProvider as keyof typeof CABLE_PACKAGES]?.find((p) => p.id === formData.cablePackage)?.name || ''
+                : '',
+              'Select bouquet'
             )}
           </>
         );
@@ -279,56 +394,51 @@ export function PurchaseForm({ serviceType, onComplete }: PurchaseFormProps) {
       case 'airtimeToCash':
         return (
           <>
-            <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('network')}>
-              <Text style={styles.selectLabel}>Network Provider</Text>
-              <View style={styles.selectValue}>
-                <Text style={formData.network ? styles.selectValueText : styles.selectPlaceholder}>
-                  {formData.network ? NETWORK_PROVIDERS.find(n => n.id === formData.network)?.name : 'Select network'}
-                </Text>
-                <ChevronDown size={20} color={Colors.mute} />
-              </View>
-            </TouchableOpacity>
+            {renderNetworkField('Network')}
             <Input
-              label="Amount"
-              placeholder="Enter amount"
-              value={formData.amount}
-              onChangeText={(v) => updateForm('amount', v)}
-              keyboardType="numeric"
-            />
-            <Input
-              label="Phone Number"
-              placeholder="Enter phone number"
+              label="Airtime sender line"
+              placeholder="0803 000 0000"
               value={formData.phone}
               onChangeText={(v) => updateForm('phone', v)}
               keyboardType="phone-pad"
             />
+            {renderAmountField('Airtime value', [1000, 2000, 5000, 10000])}
+            {renderSelectField('Payout account', 'payout', PAYOUT_OPTIONS.find((p) => p.id === formData.payout)?.name || '', 'Select payout account')}
           </>
         );
 
       case 'education':
         return (
           <>
-            <TouchableOpacity style={styles.selectField} onPress={() => setShowPicker('examBody')}>
-              <Text style={styles.selectLabel}>Exam Body</Text>
-              <View style={styles.selectValue}>
-                <Text style={formData.examBody ? styles.selectValueText : styles.selectPlaceholder}>
-                  {formData.examBody ? EXAM_BODIES.find(e => e.id === formData.examBody)?.name : 'Select exam body'}
-                </Text>
-                <ChevronDown size={20} color={Colors.mute} />
-              </View>
-            </TouchableOpacity>
+            {renderSelectField('Exam body', 'examBody', examName(formData.examBody), 'Select exam body')}
+            <Text style={styles.selectLabel}>Quantity</Text>
+            <View style={styles.stepper}>
+              <TouchableOpacity
+                style={styles.stepperButton}
+                onPress={() => updateForm('quantity', String(Math.max(1, (parseInt(formData.quantity) || 1) - 1)))}
+              >
+                <Text style={styles.stepperButtonText}>−</Text>
+              </TouchableOpacity>
+              <Text style={styles.stepperValue}>{formData.quantity || '1'}</Text>
+              <TouchableOpacity
+                style={[styles.stepperButton, styles.stepperButtonActive]}
+                onPress={() => updateForm('quantity', String((parseInt(formData.quantity) || 1) + 1))}
+              >
+                <Text style={styles.stepperButtonText}>+</Text>
+              </TouchableOpacity>
+            </View>
             <Input
-              label="Quantity"
-              placeholder="Enter quantity"
-              value={formData.quantity}
-              onChangeText={(v) => updateForm('quantity', v)}
-              keyboardType="numeric"
+              label="Delivery email"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChangeText={(v) => updateForm('email', v)}
+              keyboardType="email-address"
             />
             {formData.examBody && (
-              <Card variant="green" padding="md">
+              <Card variant="sage" padding="md" shadow="none">
                 <Text style={styles.priceLabel}>Price per PIN</Text>
                 <Text style={styles.priceValue}>
-                  {formatCurrency(EXAM_BODIES.find(e => e.id === formData.examBody)?.price || 0)}
+                  {formatCurrency(EXAM_BODIES.find((e) => e.id === formData.examBody)?.price || 0)}
                 </Text>
               </Card>
             )}
@@ -345,20 +455,32 @@ export function PurchaseForm({ serviceType, onComplete }: PurchaseFormProps) {
         items = NETWORK_PROVIDERS;
         break;
       case 'dataPlan':
-        items = DATA_PLANS.map(p => ({ id: p.id, name: `${p.size} - ${p.duration}`, subtitle: formatCurrency(p.price) }));
+        items = DATA_PLANS.map((p) => ({ id: p.id, name: `${p.size} · ${p.duration}`, subtitle: formatCurrency(p.price) }));
         break;
       case 'disco':
         items = ELECTRICITY_DISCOS;
+        break;
+      case 'meterType':
+        items = [
+          { id: 'prepaid', name: 'Prepaid' },
+          { id: 'postpaid', name: 'Postpaid' },
+        ];
         break;
       case 'cableProvider':
         items = CABLE_PROVIDERS;
         break;
       case 'cablePackage':
-        const packages = CABLE_PACKAGES[formData.cableProvider as keyof typeof CABLE_PACKAGES] || [];
-        items = packages.map(p => ({ id: p.id, name: p.name, subtitle: formatCurrency(p.price) }));
+        items = (CABLE_PACKAGES[formData.cableProvider as keyof typeof CABLE_PACKAGES] || []).map((p) => ({
+          id: p.id,
+          name: p.name,
+          subtitle: formatCurrency(p.price),
+        }));
         break;
       case 'examBody':
-        items = EXAM_BODIES.map(e => ({ id: e.id, name: e.name, subtitle: formatCurrency(e.price) }));
+        items = EXAM_BODIES.map((e) => ({ id: e.id, name: e.name, subtitle: formatCurrency(e.price) }));
+        break;
+      case 'payout':
+        items = PAYOUT_OPTIONS;
         break;
     }
 
@@ -369,7 +491,7 @@ export function PurchaseForm({ serviceType, onComplete }: PurchaseFormProps) {
         title="Select Option"
       >
         <ScrollView style={styles.pickerList}>
-          {items.map(item => (
+          {items.map((item) => (
             <TouchableOpacity
               key={item.id}
               style={styles.pickerItem}
@@ -386,110 +508,139 @@ export function PurchaseForm({ serviceType, onComplete }: PurchaseFormProps) {
     );
   };
 
-  if (step === 'success') {
-    return (
-      <View style={styles.successContainer}>
-        <View style={styles.successIcon}>
-          <Check size={48} color={Colors.positive} />
-        </View>
-        <Text style={styles.successTitle}>Transaction Successful!</Text>
-        <Text style={styles.successSubtitle}>
-          Your {getServiceName().toLowerCase()} purchase was successful
-        </Text>
-        <View style={styles.receiptCard}>
-          <Text style={styles.receiptLabel}>Amount</Text>
-          <Text style={styles.receiptValue}>{formatCurrency(getAmount())}</Text>
-        </View>
-        <View style={styles.successActions}>
-          <Button title="Go to Dashboard" onPress={onComplete} fullWidth />
-          <Button title="Make Another Purchase" variant="tertiary" onPress={() => setStep('form')} fullWidth />
+  const renderError = () =>
+    error ? (
+      <View style={styles.errorBox}>
+        <AlertCircle size={16} color={Colors.negative} style={{ marginTop: 2 }} />
+        <View style={styles.errorContent}>
+          <Text style={styles.errorText}>{error}</Text>
+          {getAmount() > (user?.walletBalance || 0) && (
+            <TouchableOpacity onPress={onComplete}>
+              <Text style={styles.errorLink}>Go to dashboard to fund wallet</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
+    ) : null;
+
+  if (step === 'done') {
+    const receipt = {
+      id: `TXN${Date.now()}`,
+      reference: `REF${Date.now()}`,
+    };
+    return (
+      <Card padding="lg">
+        <View style={styles.doneHero}>
+          <View style={styles.doneIcon}>
+            <Check size={28} color={Colors.ink} />
+          </View>
+          <Text style={styles.doneTitle}>Payment successful</Text>
+          <Text style={styles.doneSubtitle}>{getSummary()}</Text>
+        </View>
+        <View style={styles.receiptList}>
+          <DetailRow label="Transaction ID" value={receipt.id} />
+          <DetailRow label="Reference" value={receipt.reference} />
+          <DetailRow label="Service" value={getServiceName()} />
+          <DetailRow label="Recipient" value={formData.phone || formData.meterNumber || formData.smartCardNumber || formData.email || formData.payout || '—'} />
+          <DetailRow label="Amount" value={formatCurrency(getAmount())} />
+          <DetailRow label="Fee" value={formatCurrency(0)} />
+          <DetailRow label="Date" value={formatDate(new Date().toISOString())} />
+          <DetailRow label="Status" value="Successful" />
+        </View>
+        <View style={styles.doneActions}>
+          <Button title="Go to Dashboard" variant="outline" onPress={onComplete} fullWidth />
+          <Button
+            title="Make Another Purchase"
+            onPress={() => {
+              setFormData({
+                network: '', phone: '', amount: '', dataPlan: '', disco: '', meterNumber: '',
+                meterType: '', cableProvider: '', smartCardNumber: '', cablePackage: '',
+                examBody: '', quantity: '1', email: '', payout: '',
+              });
+              setError(null);
+              setStep('form');
+            }}
+            fullWidth
+          />
+        </View>
+      </Card>
     );
   }
 
   if (step === 'processing') {
     return (
-      <View style={styles.processingContainer}>
-        <Text style={styles.processingText}>Processing transaction...</Text>
-      </View>
+      <Card padding="lg">
+        <View style={styles.processingContainer}>
+          <Loader2 size={36} color={Colors.secondary} style={styles.spinner} />
+          <Text style={styles.processingTitle}>Processing your payment…</Text>
+          <Text style={styles.processingSubtitle}>Please don&apos;t close this page.</Text>
+        </View>
+      </Card>
     );
   }
 
   if (step === 'review') {
     return (
-      <View style={styles.reviewContainer}>
-        <Text style={styles.reviewTitle}>Review Transaction</Text>
-        
-        <Card variant="sage" padding="lg">
-          <View style={styles.reviewRow}>
-            <Text style={styles.reviewLabel}>Service</Text>
-            <Text style={styles.reviewValue}>{getServiceName()}</Text>
-          </View>
-          <View style={styles.reviewRow}>
-            <Text style={styles.reviewLabel}>Amount</Text>
-            <Text style={styles.reviewValue}>{formatCurrency(getAmount())}</Text>
-          </View>
-          {formData.phone && (
-            <View style={styles.reviewRow}>
-              <Text style={styles.reviewLabel}>Phone</Text>
-              <Text style={styles.reviewValue}>{formData.phone}</Text>
-            </View>
-          )}
-          {formData.meterNumber && (
-            <View style={styles.reviewRow}>
-              <Text style={styles.reviewLabel}>Meter</Text>
-              <Text style={styles.reviewValue}>{formData.meterNumber}</Text>
-            </View>
-          )}
-          {formData.smartCardNumber && (
-            <View style={styles.reviewRow}>
-              <Text style={styles.reviewLabel}>Smart Card</Text>
-              <Text style={styles.reviewValue}>{formData.smartCardNumber}</Text>
-            </View>
-          )}
-        </Card>
-
-        <View style={styles.balanceInfo}>
-          <Text style={styles.balanceLabel}>Wallet Balance</Text>
-          <Text style={styles.balanceValue}>{formatCurrency(user?.walletBalance || 0)}</Text>
+      <Card padding="lg">
+        <Text style={styles.cardTitle}>Review & confirm</Text>
+        <View style={styles.reviewList}>
+          <DetailRow label="Service" value={getServiceName()} />
+          {getReviewItems().map((item) => (
+            <DetailRow key={item.label} label={item.label} value={item.value} />
+          ))}
+          <DetailRow label="Fee" value={formatCurrency(0)} />
         </View>
-
-        <Button
-          title="Confirm & Pay"
-          onPress={handleConfirm}
-          fullWidth
-          loading={isLoading}
-        />
-        <Button title="Back" variant="tertiary" onPress={() => setStep('form')} fullWidth />
-      </View>
+        <View style={styles.totalBar}>
+          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalValue}>{formatCurrency(getAmount())}</Text>
+        </View>
+        <View style={styles.reviewActions}>
+          <Button
+            title="Edit details"
+            variant="outline"
+            onPress={() => setStep('form')}
+            fullWidth
+            icon={<ArrowLeft size={16} color={Colors.ink} />}
+          />
+          <Button title="Confirm & Pay" onPress={handleConfirm} fullWidth loading={isLoading} />
+        </View>
+      </Card>
     );
   }
 
   return (
-    <ScrollView style={styles.formContainer} showsVerticalScrollIndicator={false}>
-      <Text style={styles.formTitle}>{getServiceName()}</Text>
+    <Card padding="lg">
+      <Text style={styles.cardTitle}>{TITLES[serviceType] || getServiceName()}</Text>
       {renderFormFields()}
+      {renderError()}
       {renderPicker()}
       <Button
-        title="Continue"
+        title="Review payment"
         onPress={handleContinue}
         fullWidth
-        disabled={!validateForm()}
+        disabled={validateForm() !== null}
       />
-    </ScrollView>
+    </Card>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={styles.detailValue} numberOfLines={1}>{value}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  formContainer: {
-    flex: 1,
-  },
-  formTitle: {
-    fontSize: 24,
+  cardTitle: {
+    fontSize: 16,
     fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
     color: Colors.ink,
-    marginBottom: Spacing.xl,
+    letterSpacing: -0.32,
+    marginBottom: Spacing.lg,
   },
   selectField: {
     marginBottom: Spacing.lg,
@@ -506,7 +657,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: Colors.canvas,
     borderWidth: 1,
-    borderColor: Colors.ink,
+    borderColor: Colors.border,
     borderRadius: Rounded.md,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
@@ -519,45 +670,110 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.mute,
   },
+  networkRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  networkTile: {
+    flexGrow: 1,
+    flexBasis: '22%',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Rounded.lg,
+    backgroundColor: Colors.canvas,
+  },
+  networkTileActive: {
+    borderColor: Colors.ink,
+    backgroundColor: Colors.primary,
+  },
+  networkLogo: {
+    width: 44,
+    height: 28,
+  },
+  networkFallback: {
+    width: 44,
+    height: 28,
+    lineHeight: 28,
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '800',
+    color: Colors.ink,
+  },
+  networkName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.body,
+    textAlign: 'center',
+  },
+  networkNameActive: {
+    color: Colors.ink,
+    fontWeight: '700',
+  },
   presets: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.sm,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   presetButton: {
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.canvasSoft,
-    borderRadius: Rounded.md,
+    backgroundColor: Colors.canvas,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Rounded.pill,
+  },
+  presetActive: {
+    borderColor: Colors.ink,
+    backgroundColor: Colors.primary,
   },
   presetText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: Colors.ink,
   },
-  meterTypeContainer: {
+  presetTextActive: {
+    fontWeight: '700',
+  },
+  stepper: {
     flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
     gap: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Rounded.lg,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
     marginBottom: Spacing.lg,
   },
-  meterTypeButton: {
-    flex: 1,
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
+  stepperButton: {
+    width: 32,
+    height: 32,
+    borderRadius: Rounded.sm,
     backgroundColor: Colors.canvasSoft,
-    borderRadius: Rounded.md,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  meterTypeActive: {
-    backgroundColor: Colors.secondary,
+  stepperButtonActive: {
+    backgroundColor: Colors.primary,
   },
-  meterTypeText: {
-    fontSize: 14,
-    fontWeight: '600',
+  stepperButtonText: {
+    fontSize: 18,
+    fontWeight: '700',
     color: Colors.ink,
+    lineHeight: 22,
   },
-  meterTypeTextActive: {
-    color: Colors.canvas,
+  stepperValue: {
+    minWidth: 32,
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.ink,
   },
   priceLabel: {
     fontSize: 12,
@@ -566,7 +782,32 @@ const styles = StyleSheet.create({
   priceValue: {
     fontSize: 20,
     fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
     color: Colors.ink,
+  },
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    backgroundColor: Colors.negative + '1a',
+    borderRadius: Rounded.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  errorContent: {
+    flex: 1,
+  },
+  errorText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.negative,
+  },
+  errorLink: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.negative,
+    textDecorationLine: 'underline',
+    marginTop: Spacing.xs,
   },
   pickerList: {
     maxHeight: 400,
@@ -589,104 +830,101 @@ const styles = StyleSheet.create({
     color: Colors.mute,
     marginTop: Spacing.xxs,
   },
-  reviewContainer: {
-    flex: 1,
-  },
-  reviewTitle: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: Colors.ink,
-    marginBottom: Spacing.xl,
-  },
-  reviewRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.md,
-  },
-  reviewLabel: {
-    fontSize: 14,
-    color: Colors.body,
-  },
-  reviewValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.ink,
-  },
-  balanceInfo: {
+  detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: Colors.primaryPale,
-    padding: Spacing.lg,
-    borderRadius: Rounded.lg,
-    marginBottom: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.canvasSoft,
   },
-  balanceLabel: {
+  detailLabel: {
     fontSize: 14,
     color: Colors.body,
   },
-  balanceValue: {
-    fontSize: 18,
+  detailValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.ink,
+    flex: 1,
+    textAlign: 'right',
+    marginLeft: Spacing.lg,
+  },
+  totalBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: Colors.canvasSoft,
+    borderRadius: Rounded['2xl'],
+    padding: Spacing.lg,
+    marginTop: Spacing.lg,
+  },
+  totalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.body,
+  },
+  totalValue: {
+    fontSize: 22,
     fontWeight: '900',
-    color: Colors.secondary,
+    fontFamily: 'Archivo_900Black',
+    color: Colors.ink,
+    letterSpacing: -0.4,
+  },
+  reviewList: {
+    marginTop: Spacing.xs,
+  },
+  reviewActions: {
+    gap: Spacing.md,
+    marginTop: Spacing.lg,
   },
   processingContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: Spacing['3xl'],
   },
-  processingText: {
+  spinner: {
+    marginBottom: Spacing.lg,
+  },
+  processingTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
     color: Colors.ink,
-  },
-  successContainer: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: Spacing['2xl'],
-  },
-  successIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primaryPale,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: Spacing.xl,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: Colors.ink,
-    marginBottom: Spacing.sm,
-  },
-  successSubtitle: {
-    fontSize: 14,
-    color: Colors.body,
-    marginBottom: Spacing.xl,
-    textAlign: 'center',
-  },
-  receiptCard: {
-    width: '100%',
-    backgroundColor: Colors.canvasSoft,
-    padding: Spacing.lg,
-    borderRadius: Rounded.lg,
-    alignItems: 'center',
-    marginBottom: Spacing['2xl'],
-  },
-  receiptLabel: {
-    fontSize: 12,
-    color: Colors.mute,
     marginBottom: Spacing.xs,
   },
-  receiptValue: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: Colors.ink,
+  processingSubtitle: {
+    fontSize: 14,
+    color: Colors.body,
   },
-  successActions: {
-    width: '100%',
+  doneHero: {
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
+  doneIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
+  doneTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
+    color: Colors.ink,
+    letterSpacing: -0.48,
+    marginBottom: Spacing.xs,
+  },
+  doneSubtitle: {
+    fontSize: 14,
+    color: Colors.body,
+  },
+  receiptList: {
+    marginTop: Spacing.sm,
+  },
+  doneActions: {
     gap: Spacing.md,
+    marginTop: Spacing.lg,
   },
 });

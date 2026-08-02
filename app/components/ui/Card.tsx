@@ -1,13 +1,19 @@
 import { View, StyleSheet } from 'react-native';
-import { Colors, Rounded, Spacing } from '../../constants/colors';
+import { Colors, Rounded, Spacing, Shadows } from '../../constants/colors';
 
 interface CardProps {
   children: React.ReactNode;
   variant?: 'default' | 'sage' | 'green' | 'dark';
   padding?: 'sm' | 'md' | 'lg';
+  shadow?: 'none' | 'card' | 'lift';
 }
 
-export function Card({ children, variant = 'default', padding = 'lg' }: CardProps) {
+export function Card({
+  children,
+  variant = 'default',
+  padding = 'lg',
+  shadow = 'card',
+}: CardProps) {
   const getVariantStyles = () => {
     switch (variant) {
       case 'sage':
@@ -32,12 +38,24 @@ export function Card({ children, variant = 'default', padding = 'lg' }: CardProp
     }
   };
 
+  const getShadow = () => {
+    switch (shadow) {
+      case 'lift':
+        return Shadows.lift;
+      case 'none':
+        return null;
+      default:
+        return Shadows.card;
+    }
+  };
+
   return (
     <View
       style={[
         styles.card,
         getVariantStyles(),
         { padding: getPaddingStyles() },
+        getShadow(),
       ]}
     >
       {children}
@@ -47,6 +65,6 @@ export function Card({ children, variant = 'default', padding = 'lg' }: CardProp
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: Rounded.xl,
+    borderRadius: Rounded['2xl'],
   },
 });

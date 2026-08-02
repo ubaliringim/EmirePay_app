@@ -9,7 +9,7 @@ interface InputProps {
   value: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
+  keyboardType?: 'default' | 'numeric' | 'number-pad' | 'email-address' | 'phone-pad';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   error?: string;
   showPasswordToggle?: boolean;
@@ -32,11 +32,13 @@ export function Input({
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <View style={[
-        styles.inputContainer,
-        isFocused && styles.inputFocused,
-        error && styles.inputError,
-      ]}>
+      <View
+        style={[
+          styles.inputContainer,
+          isFocused && styles.inputFocused,
+          error && styles.inputError,
+        ]}
+      >
         <TextInput
           style={styles.input}
           placeholder={placeholder}
@@ -82,13 +84,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.canvas,
     borderWidth: 1,
-    borderColor: Colors.ink,
+    borderColor: Colors.border,
     borderRadius: Rounded.md,
     paddingHorizontal: Spacing.lg,
+    transitionProperty: 'border-color, box-shadow',
+    transitionDuration: '150ms',
   },
   inputFocused: {
     borderColor: Colors.secondary,
-    borderWidth: 2,
+    boxShadow: `0 0 0 3px ${Colors.primaryPale}`,
   },
   inputError: {
     borderColor: Colors.negative,

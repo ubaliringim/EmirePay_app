@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
-import { Smartphone, Wifi, Zap, Tv, GraduationCap, Wallet, Filter, Calendar } from 'lucide-react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
+import { Smartphone, Wifi, Zap, Tv, GraduationCap, Repeat, Wallet, Filter } from 'lucide-react-native';
 import { Card, Badge, BottomSheet } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
@@ -12,6 +12,7 @@ const ICON_MAP: Record<string, any> = {
   Electricity: Zap,
   'Cable TV': Tv,
   'Education PIN': GraduationCap,
+  'Airtime to Cash': Repeat,
   'Wallet Funding': Wallet,
 };
 
@@ -19,6 +20,7 @@ export function TransactionList() {
   const { transactions } = useUserStore();
   const [refreshing, setRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [selected, setSelected] = useState<(typeof transactions)[0] | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
@@ -47,12 +49,16 @@ export function TransactionList() {
     const isCredit = item.type === 'Wallet Funding';
 
     return (
-      <TouchableOpacity style={styles.transactionItem} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.transactionItem}
+        onPress={() => setSelected(item)}
+        activeOpacity={0.7}
+      >
         <View style={styles.transactionIcon}>
           <IconComponent size={20} color={Colors.ink} />
         </View>
         <View style={styles.transactionInfo}>
-          <Text style={styles.transactionType}>{item.type}</Text>
+          <Text style={styles.transactionType} numberOfLines={1}>{item.type}</Text>
           <Text style={styles.transactionDate}>{formatDate(item.date)}</Text>
         </View>
         <View style={styles.transactionRight}>
@@ -65,10 +71,20 @@ export function TransactionList() {
     );
   };
 
+  const renderDetailRow = (label: string, value: string) => (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={styles.detailValue} numberOfLines={1}>{value}</Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Transactions</Text>
+        <View>
+          <Text style={styles.title}>Transactions</Text>
+          <Text style={styles.subtitle}>{filteredTransactions.length} records found</Text>
+        </View>
         <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilters(true)}>
           <Filter size={20} color={Colors.ink} />
         </TouchableOpacity>
@@ -133,6 +149,26 @@ export function TransactionList() {
           </TouchableOpacity>
         </View>
       </BottomSheet>
+
+      <BottomSheet visible={!!selected} onClose={() => setSelected(null)} title="Transaction Receipt">
+        {selected ? (
+          <ScrollView style={styles.detailContent} showsVerticalScrollIndicator={false}>
+            <View style={styles.receiptHero}>
+              <Text style={styles.receiptAmount}>
+                {selected.type === 'Wallet Funding' ? '+' : '-'}{formatCurrency(selected.amount)}
+              </Text>
+              <Badge text={selected.status} variant={getStatusVariant(selected.status) as any} />
+            </View>
+            <Card variant="sage" padding="lg" shadow="none">
+              {renderDetailRow('Service', selected.type)}
+              {renderDetailRow('Recipient', selected.recipient)}
+              {renderDetailRow('Reference', selected.reference)}
+              {renderDetailRow('Date', formatDate(selected.date))}
+              {renderDetailRow('Status', selected.status)}
+            </Card>
+          </ScrollView>
+        ) : null}
+      </BottomSheet>
     </View>
   );
 }
@@ -153,7 +189,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
     color: Colors.ink,
+    letterSpacing: -0.48,
+  },
+  subtitle: {
+    fontSize: 12,
+    color: Colors.body,
+    marginTop: Spacing.xxs,
   },
   filterButton: {
     width: 40,
@@ -177,7 +220,7 @@ const styles = StyleSheet.create({
   transactionIcon: {
     width: 44,
     height: 44,
-    borderRadius: Rounded.md,
+    borderRadius: Rounded.full,
     backgroundColor: Colors.canvasSoft,
     justifyContent: 'center',
     alignItems: 'center',
@@ -234,19 +277,22 @@ const styles = StyleSheet.create({
   filterOption: {
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.canvasSoft,
+    backgroundColor: Colors.canvas,
+    borderWidth: 1,
+    borderColor: Colors.border,
     borderRadius: Rounded.pill,
   },
   filterOptionActive: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.ink,
   },
   filterOptionText: {
     fontSize: 14,
-    color: Colors.ink,
+    color: Colors.body,
   },
   filterOptionTextActive: {
-    color: Colors.canvas,
-    fontWeight: '600',
+    color: Colors.ink,
+    fontWeight: '700',
   },
   clearButton: {
     alignItems: 'center',
@@ -256,5 +302,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: Colors.secondary,
+  },
+  detailContent: {
+    padding: Spacing.xl,
+  },
+  receiptHero: {
+    alignItems: 'center',
+    marginBottom: Spacing.xl,
+  },
+  receiptAmount: {
+    fontSize: 32,
+    fontWeight: '900',
+    fontFamily: 'Archivo_900Black',
+    color: Colors.ink,
+    letterSpacing: -0.64,
+    marginBottom: Spacing.sm,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: Colors.body,
+  },
+  detailValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.ink,
+    flex: 1,
+    textAlign: 'right',
+    marginLeft: Spacing.lg,
   },
 });
