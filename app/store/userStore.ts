@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { MOCK_USER, MOCK_TRANSACTIONS } from '../data/mockData';
+import { firebaseAuth } from '../services/firebase';
 
 interface Transaction {
   id: string;
@@ -16,10 +17,10 @@ interface UserState {
   isAuthenticated: boolean;
   transactions: Transaction[];
   isLoading: boolean;
-  
+
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (data: any) => Promise<boolean>;
-  logout: () => void;
+  signup: (data: { fullName: string; email: string; phone: string; password: string }) => Promise<boolean>;
+  logout: () => Promise<void>;
   updateBalance: (amount: number, operation: 'add' | 'subtract') => void;
   addTransaction: (transaction: Transaction) => void;
   updateProfile: (data: Partial<typeof MOCK_USER>) => void;
@@ -30,54 +31,81 @@ export const useUserStore = create<UserState>((set, get) => ({
   isAuthenticated: false,
   transactions: [],
   isLoading: false,
-  
-  login: async (email: string, password: string) => {
+
+  login: async (email, password) => {
     set({ isLoading: true });
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    set({
-      user: MOCK_USER,
-      isAuthenticated: true,
-      transactions: MOCK_TRANSACTIONS,
-      isLoading: false,
-    });
-    return true;
+    try {
+      const fbUser = await firebaseAuth.signIn(email, password);
+      set({
+        user: {
+          ...MOCK_USER,
+          email,
+          fullName: fbUser.displayName || MOCK_USER.fullName,
+        },
+        isAuthenticated: true,
+        transactions: MOCK_TRANSACTIONS,
+      });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      set({ isLoading: false });
+    }
   },
-  
-  signup: async (data: any) => {
+
+  signup: async (data) => {
     set({ isLoading: true });
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    set({
-      user: { ...MOCK_USER, ...data },
-      isAuthenticated: true,
-      transactions: MOCK_TRANSACTIONS,
-      isLoading: false,
-    });
-    return true;
+    try {
+      await firebaseAuth.signUp(data.email, data.password, data.fullName);
+      set({
+        user: {
+          ...MOCK_USER,
+          fullName: data.fullName || MOCK_USER.fullName,
+          email: data.email,
+          phone: data.phone || MOCK_USER.phone,
+        },
+        isAuthenticated: true,
+        transactions: MOCK_TRANSACTIONS,
+      });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      set({ isLoading: false });
+    }
   },
-  
-  logout: () => {
+
+  logout: async () => {
+    try {
+      await firebaseAuth.signOut();
+    } catch {
+      // ignore
+    }
     set({ user: null, isAuthenticated: false, transactions: [] });
   },
-  
-  updateBalance: (amount: number, operation: 'add' | 'subtract') => {
-    set(state => ({
-      user: state.user ? {
-        ...state.user,
-        walletBalance: operation === 'add' 
-          ? state.user.walletBalance + amount 
-          : state.user.walletBalance - amount,
-      } : null,
+
+  updateBalance: (amount, operation) => {
+    set((state) => ({
+      user: state.user
+        ? {
+            ...state.user,
+            walletBalance:
+              operation === 'add'
+                ? state.user.walletBalance + amount
+                : state.user.walletBalance - amount,
+          }
+        : null,
     }));
   },
-  
-  addTransaction: (transaction: Transaction) => {
-    set(state => ({
+
+  addTransaction: (transaction) => {
+    set((state) => ({
       transactions: [transaction, ...state.transactions],
     }));
   },
-  
-  updateProfile: (data: Partial<typeof MOCK_USER>) => {
-    set(state => ({
+
+  updateProfile: (data) => {
+    set((state) => ({
       user: state.user ? { ...state.user, ...data } : null,
     }));
   },

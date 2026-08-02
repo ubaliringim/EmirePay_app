@@ -1,13 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { SplashScreen, LoginScreen, SignupScreen, ForgotPasswordScreen } from '../components/auth';
 import { useRouter } from 'expo-router';
+import { firebaseAuth } from '../services/firebase';
 
 type AuthStep = 'splash' | 'login' | 'signup' | 'forgotPassword';
 
 export default function AuthFlow() {
   const [step, setStep] = useState<AuthStep>('splash');
   const router = useRouter();
+
+  useEffect(() => {
+    let unsub = () => {};
+    try {
+      unsub = firebaseAuth.onAuthStateChange((user) => {
+        if (user) {
+          router.replace('/(tabs)');
+        }
+      });
+    } catch {
+      // Native Firebase module unavailable (e.g. Expo Go); stay on auth flow.
+    }
+    return () => unsub();
+  }, [router]);
 
   const handleAuthSuccess = () => {
     router.replace('/(tabs)');

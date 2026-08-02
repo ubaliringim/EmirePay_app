@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Landing } from "./routes/index";
 import { LogIn } from "./routes/login";
 import { SignUp } from "./routes/signup";
-import { AppLayout } from "./routes/app";
+import { AppLayout, RequireAuth } from "./routes/app";
 import { Dashboard } from "./routes/app.index";
 import { PurchasePage } from "./routes/app.purchase";
 import { TransactionsPage } from "./routes/app.transactions";
@@ -16,7 +16,14 @@ function RootLayout() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/app" element={<AppLayout />}>
+        <Route
+          path="/app"
+          element={
+            <RequireAuth>
+              <AppLayout />
+            </RequireAuth>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="purchase" element={<PurchasePage />} />
           <Route path="transactions" element={<TransactionsPage />} />

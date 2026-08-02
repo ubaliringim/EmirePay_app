@@ -6,6 +6,7 @@ import { ArrowLeft, Mail, Key, CheckCircle } from 'lucide-react-native';
 import { Button, Input } from '../ui';
 import { Colors, Spacing, Rounded } from '../../constants/colors';
 import { AuthCard } from './AuthCard';
+import { firebaseAuth } from '../../services/firebase';
 
 interface ForgotPasswordScreenProps {
   onBack: () => void;
@@ -62,19 +63,27 @@ export function ForgotPasswordScreen({ onBack }: ForgotPasswordScreenProps) {
 
   const handleNext = async () => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-
-    switch (step) {
-      case 'email':
-        if (validateEmail()) setStep('otp');
-        break;
-      case 'otp':
-        if (validateOTP()) setStep('reset');
-        break;
-      case 'reset':
-        if (validatePassword()) setStep('success');
-        break;
+    try {
+      switch (step) {
+        case 'email':
+          if (validateEmail()) {
+            await firebaseAuth.resetPassword(email);
+            setStep('success');
+          }
+          break;
+        case 'otp':
+          if (validateOTP()) setStep('reset');
+          break;
+        case 'reset':
+          if (validatePassword()) setStep('success');
+          break;
+      }
+    } catch {
+      setErrors({
+        email: 'Could not send reset email. Check the address and try again.',
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 

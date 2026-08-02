@@ -18,7 +18,9 @@ export function AuthShell({
       <aside className="hidden min-h-screen flex-col justify-between bg-ink p-8 xl:p-12 lg:flex overflow-hidden">
         <Wordmark tone="light" />
         <div className="my-auto py-10">
-          <h2 className="display-mega text-4xl xl:text-5xl text-primary">Money moves safely here.</h2>
+          <h2 className="display-mega text-4xl xl:text-5xl text-primary">
+            Money moves safely here.
+          </h2>
           <p className="mt-4 max-w-md text-sm text-canvas-soft/70">
             Every Emir Pay account is protected with encrypted sessions, transaction monitoring and
             round-the-clock human support.

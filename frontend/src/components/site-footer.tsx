@@ -73,7 +73,10 @@ export function SiteFooter() {
 
       <div className="border-t border-canvas-soft/10">
         <div className="section-shell flex flex-col gap-2 py-6 text-xs text-canvas-soft/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Emir Pay. Created by Teamstack Technologies Ltd. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} Emir Pay. Created by Teamstack Technologies Ltd. All rights
+            reserved.
+          </p>
           <p>emirpay@gmail.com · 0906 065 9999 · Kano State, Nigeria</p>
         </div>
       </div>

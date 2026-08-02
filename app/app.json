@@ -7,16 +7,19 @@
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "android": {
+      "package": "com.emirpay.app"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.emirpay.app"
     },
     "web": {
       "bundler": "metro",
       "output": "single"
     },
     "plugins": [
-      "expo-router",
-      "react-native-edge-to-edge"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true
