@@ -59,7 +59,7 @@ Our Goal: To build a trusted platform where customers manage all everyday paymen
 8. Contact Section
    Display:
 
-Email: emirpay@gmail.com
+Email: emirpaymentsolutions@gmail.com
 Phone: 09060659999
 Address: Hauran Wanki Sharada Masallaci street, Kano State, Nigeria
 Include a simple contact form (Name, Email, Message) alongside the contact details.

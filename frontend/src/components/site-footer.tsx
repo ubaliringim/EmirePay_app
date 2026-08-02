@@ -53,8 +53,8 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-3 text-sm text-canvas-soft/70">
             <li className="flex items-start gap-3">
               <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <a href="mailto:emirpay@gmail.com" className="hover:text-primary">
-                emirpay@gmail.com
+              <a href="mailto:emirpaymentsolutions@gmail.com" className="hover:text-primary">
+                emirpaymentsolutions@gmail.com
               </a>
             </li>
             <li className="flex items-start gap-3">
@@ -73,11 +73,8 @@ export function SiteFooter() {
 
       <div className="border-t border-canvas-soft/10">
         <div className="section-shell flex flex-col gap-2 py-6 text-xs text-canvas-soft/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © {new Date().getFullYear()} Emir Pay. Created by Teamstack Technologies Ltd. All rights
-            reserved.
-          </p>
-          <p>emirpay@gmail.com · 0906 065 9999 · Kano State, Nigeria</p>
+          <p>© {new Date().getFullYear()} Emir Pay. Created by Teamstack Technologies Ltd. All rights reserved.</p>
+          <p>emirpaymentsolutions@gmail.com · 0906 065 9999 · Kano State, Nigeria</p>
         </div>
       </div>
     </footer>
