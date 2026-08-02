@@ -1,11 +1,14 @@
 import type { ServiceId } from "@/lib/mock-data";
+import mtnLogo from "@/assets/mtn.jpg";
+import airtelLogo from "@/assets/airtel.jpg";
+import gloLogo from "@/assets/glo.jpg";
 
 export type FieldConfig =
   | {
       type: "select";
       name: string;
       label: string;
-      options: { value: string; label: string; price?: number }[];
+      options: { value: string; label: string; price?: number; logo?: string }[];
       placeholder?: string;
     }
   | { type: "text" | "tel" | "email"; name: string; label: string; placeholder?: string }
@@ -20,9 +23,9 @@ export type ServiceConfig = {
 };
 
 const networks = [
-  { value: "MTN", label: "MTN" },
-  { value: "Airtel", label: "Airtel" },
-  { value: "Glo", label: "Glo" },
+  { value: "MTN", label: "MTN", logo: mtnLogo },
+  { value: "Airtel", label: "Airtel", logo: airtelLogo },
+  { value: "Glo", label: "Glo", logo: gloLogo },
   { value: "9mobile", label: "9mobile" },
 ];
 
