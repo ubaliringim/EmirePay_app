@@ -16,6 +16,7 @@ import { useWallet } from "@/lib/wallet-store";
 import { cn } from "@/lib/utils";
 import { ActionButton } from "@/components/ui-kit";
 import avatarImg from "@/assets/avatar-3d.png";
+import { useAuth } from "@/lib/auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +51,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const { profile } = useWallet();
+  const { signOut } = useAuth();
   const isActive = useIsActive();
   const [drawer, setDrawer] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -255,7 +257,14 @@ export function AppShell({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Stay signed in</AlertDialogCancel>
-            <AlertDialogAction onClick={() => navigate("/login")}>Log Out</AlertDialogAction>
+            <AlertDialogAction
+              onClick={async () => {
+                await signOut();
+                navigate("/login");
+              }}
+            >
+              Log Out
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -40,7 +40,7 @@ export function SignupScreen({ onNavigateToLogin, onAuthSuccess }: SignupScreenP
 
   const handleSignup = async () => {
     if (validate()) {
-      const success = await signup({ fullName, email, phone });
+      const success = await signup({ fullName, email, phone, password });
       if (success) onAuthSuccess();
     }
   };
