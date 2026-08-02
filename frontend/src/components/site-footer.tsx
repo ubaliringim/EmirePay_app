@@ -1,6 +1,6 @@
 import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { Wordmark } from "@/components/wordmark";
-import logoWhiteBg from "@/assets/logowhitebg.png";
+import logoWhite from "@/assets/logo_white.png";
 
 const socials = [Facebook, Instagram, Twitter, Linkedin];
 
@@ -9,7 +9,7 @@ export function SiteFooter() {
     <footer className="bg-ink text-canvas-soft">
       <div className="section-shell grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1.2fr]">
         <div className="space-y-4">
-          <Wordmark tone="light" src={logoWhiteBg} />
+          <Wordmark tone="light" src={logoWhite} />
           <p className="max-w-sm text-sm text-canvas-soft/70">
             Fast, secure and affordable digital payments for individuals, businesses, agents and
             developers across Nigeria.
@@ -73,7 +73,7 @@ export function SiteFooter() {
 
       <div className="border-t border-canvas-soft/10">
         <div className="section-shell flex flex-col gap-2 py-6 text-xs text-canvas-soft/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Emir Pay. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Emir Pay. Created by Teamstack Technologies Ltd. All rights reserved.</p>
           <p>emirpay@gmail.com · 0906 065 9999 · Kano State, Nigeria</p>
         </div>
       </div>
