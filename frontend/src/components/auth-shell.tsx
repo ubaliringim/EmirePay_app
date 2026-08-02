@@ -48,10 +48,10 @@ export function AuthShell({
 
       <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10">
         <div className="w-full max-w-md sm:max-w-lg my-auto">
-          <div className="mb-6 flex justify-center lg:hidden">
-            <Wordmark />
-          </div>
           <div className="surface-card p-6 sm:p-8 shadow-lift">
+            <div className="mb-6 flex justify-center">
+              <Wordmark imgClassName="h-14 w-auto" />
+            </div>
             <p className="text-xs font-bold tracking-widest text-secondary uppercase">{eyebrow}</p>
             <h1 className="mt-1 text-2xl sm:text-3xl font-black">{title}</h1>
             <p className="mt-1.5 text-sm text-body">{subtitle}</p>
