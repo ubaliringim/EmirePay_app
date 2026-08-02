@@ -6,11 +6,11 @@ import { ActionButton, Field } from "@/components/ui-kit";
 export function LogIn() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen w-full bg-canvas-soft flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-canvas-soft flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md my-auto">
-        <div className="surface-card p-6 sm:p-8 shadow-lift">
-          <div className="mb-6 flex justify-center">
-            <Wordmark imgClassName="h-14 w-auto" />
+        <div className="surface-card w-full max-w-full p-5 sm:p-7 shadow-lift overflow-hidden">
+          <div className="mb-5 flex justify-center overflow-hidden">
+            <Wordmark imgClassName="h-10 sm:h-12 max-w-full object-contain w-auto" />
           </div>
           <p className="text-xs font-bold tracking-widest text-secondary uppercase">Log in</p>
           <h1 className="mt-1 text-2xl sm:text-3xl font-black">Welcome back</h1>
