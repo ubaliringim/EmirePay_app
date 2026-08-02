@@ -29,6 +29,7 @@ import {
 import heroImage from "@/assets/hero-emirpay.png";
 import ceoImg from "@/assets/ceo.jpg";
 import cooImg from "@/assets/coo.jpg";
+import mmImg from "@/assets/mm.jpeg";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ActionButton, ActionLink, Field } from "@/components/ui-kit";
@@ -147,8 +148,8 @@ const leadership = [
   {
     name: "Muhammad Abdullahi Ahmad",
     title: "Engineer",
-    rank: "Founder / Marketing Manager",
-    image: null,
+    rank: "Marketing Manager",
+    image: mmImg,
     initials: "MA",
   },
 ];
@@ -387,10 +388,10 @@ export function Landing() {
                   <div>
                     <p className="text-sm font-semibold text-ink">Email</p>
                     <a
-                      href="mailto:emirpay@gmail.com"
+                      href="mailto:emirpaymentsolutions@gmail.com"
                       className="text-sm text-body hover:text-secondary"
                     >
-                      emirpay@gmail.com
+                      emirpaymentsolutions@gmail.com
                     </a>
                   </div>
                 </li>
