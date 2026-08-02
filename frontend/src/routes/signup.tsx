@@ -12,7 +12,7 @@ export function SignUp() {
       subtitle="It takes under a minute to start paying bills with Emir Pay."
     >
       <form
-        className="space-y-3"
+        className="w-full max-w-full space-y-3.5 overflow-hidden"
         onSubmit={(e) => {
           e.preventDefault();
           navigate("/app");
@@ -69,7 +69,7 @@ export function SignUp() {
             type="checkbox"
             className="mt-0.5 h-3.5 w-3.5 rounded border-border accent-[var(--color-secondary)] shrink-0"
           />
-          <span>
+          <span className="break-words leading-relaxed">
             I agree to the{" "}
             <a href="#" className="font-semibold text-secondary underline-offset-2 hover:underline">
               Terms &amp; Conditions

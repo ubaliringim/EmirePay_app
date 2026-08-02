@@ -14,8 +14,8 @@ export function AuthShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen w-full bg-canvas-soft lg:grid lg:grid-cols-[0.9fr_1.1fr]">
-      <aside className="hidden min-h-screen flex-col justify-between bg-ink p-8 xl:p-12 lg:flex">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-canvas-soft lg:grid lg:grid-cols-[0.9fr_1.1fr]">
+      <aside className="hidden min-h-screen flex-col justify-between bg-ink p-8 xl:p-12 lg:flex overflow-hidden">
         <Wordmark tone="light" />
         <div className="my-auto py-10">
           <h2 className="display-mega text-4xl xl:text-5xl text-primary">Money moves safely here.</h2>
@@ -46,16 +46,16 @@ export function AuthShell({
         </p>
       </aside>
 
-      <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10">
+      <main className="flex min-h-screen w-full max-w-full flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-x-hidden">
         <div className="w-full max-w-md sm:max-w-lg my-auto">
-          <div className="surface-card p-6 sm:p-8 shadow-lift">
-            <div className="mb-6 flex justify-center">
+          <div className="surface-card w-full max-w-full p-5 sm:p-7 shadow-lift overflow-hidden">
+            <div className="mb-5 flex justify-center">
               <Wordmark imgClassName="h-14 w-auto" />
             </div>
             <p className="text-xs font-bold tracking-widest text-secondary uppercase">{eyebrow}</p>
             <h1 className="mt-1 text-2xl sm:text-3xl font-black">{title}</h1>
             <p className="mt-1.5 text-sm text-body">{subtitle}</p>
-            <div className="mt-6">{children}</div>
+            <div className="mt-5">{children}</div>
           </div>
           <p className="mt-4 flex flex-wrap items-center justify-center gap-1.5 text-center text-xs text-body">
             <Lock className="h-3.5 w-3.5 shrink-0 text-secondary" />
