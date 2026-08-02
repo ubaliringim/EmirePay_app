@@ -80,8 +80,8 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-screen bg-canvas-soft lg:grid lg:grid-cols-[264px_1fr]">
-      <aside className="sticky top-0 hidden h-screen flex-col justify-between bg-ink p-6 lg:flex">
+    <div className="min-h-screen bg-canvas-soft">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col justify-between bg-ink p-6 lg:flex">
         <div>
           <Wordmark tone="light" src={logoWhite} />
           <div className="mt-10">{navList()}</div>
@@ -103,7 +103,7 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col lg:pl-[264px]">
         <header className="sticky top-0 z-40 border-b border-border bg-canvas/90 backdrop-blur-xl">
           <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-3">
