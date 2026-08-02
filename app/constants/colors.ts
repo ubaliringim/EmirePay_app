@@ -1,0 +1,45 @@
+export const Colors = {
+  primary: '#CFFFDC',
+  secondary: '#2E6F40',
+  primaryActive: '#b5f5c8',
+  primaryNeutral: '#b8ebcc',
+  primaryPale: '#e6f7ec',
+  ink: '#0e0f0c',
+  inkDeep: '#163300',
+  body: '#454745',
+  mute: '#868685',
+  canvas: '#ffffff',
+  canvasSoft: '#e8ebe6',
+  positive: '#2ead4b',
+  positiveDeep: '#054d28',
+  warning: '#ffd11a',
+  warningDeep: '#b86700',
+  warningContent: '#4a3b1c',
+  negative: '#d03238',
+  negativeDeep: '#a72027',
+  negativeDarkest: '#a7000d',
+  negativeBg: '#320707',
+  accentOrange: '#ffc091',
+  accentCyan: '#38c8ff',
+};
+
+export const Spacing = {
+  xxs: 2,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  '2xl': 32,
+  '3xl': 48,
+};
+
+export const Rounded = {
+  none: 0,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  pill: 9999,
+  full: 9999,
+};
