@@ -11,7 +11,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { Wordmark } from "@/components/wordmark";
-import logoWhiteBg from "@/assets/logowhitebg.png";
+import logoWhite from "@/assets/logo_white.png";
 import { useWallet } from "@/lib/wallet-store";
 import { cn } from "@/lib/utils";
 import { ActionButton } from "@/components/ui-kit";
@@ -83,7 +83,7 @@ export function AppShell({
     <div className="min-h-screen bg-canvas-soft lg:grid lg:grid-cols-[264px_1fr]">
       <aside className="sticky top-0 hidden h-screen flex-col justify-between bg-ink p-6 lg:flex">
         <div>
-          <Wordmark tone="light" src={logoWhiteBg} />
+          <Wordmark tone="light" src={logoWhite} />
           <div className="mt-10">{navList()}</div>
         </div>
         <div className="space-y-4">
@@ -154,7 +154,27 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="flex-1 px-4 pt-5 pb-28 sm:px-6 lg:pb-10">{children}</main>
+        <main className="flex-1 px-4 pt-5 pb-24 sm:px-6 lg:pb-10">{children}</main>
+      </div>
+
+      {/* Fixed Mobile Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-canvas/95 py-2 backdrop-blur-xl lg:hidden">
+        {nav.map((item) => {
+          const active = isActive(item.to, "exact" in item ? item.exact : false);
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={cn(
+                "flex flex-col items-center gap-1 px-3 py-1 text-[11px] font-semibold transition-colors",
+                active ? "text-secondary font-bold" : "text-body hover:text-ink",
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </div>
 
       {drawer ? (
@@ -168,7 +188,7 @@ export function AppShell({
           <div className="absolute inset-y-0 left-0 flex w-72 flex-col justify-between bg-ink p-6">
             <div>
               <div className="flex items-center justify-between">
-                <Wordmark tone="light" src={logoWhiteBg} />
+                <Wordmark tone="light" src={logoWhite} />
                 <button
                   type="button"
                   onClick={() => setDrawer(false)}
