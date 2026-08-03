@@ -1,0 +1,73 @@
+2026-08-03T05:21:24.970Z	Initializing build environment...
+2026-08-03T05:21:28.580Z	Success: Finished initializing build environment
+2026-08-03T05:21:29.746Z	Cloning repository...
+2026-08-03T05:21:32.964Z	Detected the following tools from environment: npm@10.9.2, nodejs@24.18.0
+2026-08-03T05:21:32.966Z	Restoring from dependencies cache
+2026-08-03T05:21:32.968Z	Restoring from build output cache
+2026-08-03T05:21:33.148Z	Installing project dependencies: npm clean-install --progress=false
+2026-08-03T05:21:47.206Z	npm warn deprecated recharts@2.15.4: 1.x and 2.x branches are no longer active. Bump to Recharts v3 to receive latest features and bugfixes. See https://github.com/recharts/recharts/wiki/3.0-migration-guide
+2026-08-03T05:21:55.031Z	
+2026-08-03T05:21:55.034Z	added 335 packages, and audited 336 packages in 20s
+2026-08-03T05:21:55.034Z	
+2026-08-03T05:21:55.034Z	67 packages are looking for funding
+2026-08-03T05:21:55.034Z	  run `npm fund` for details
+2026-08-03T05:21:55.060Z	
+2026-08-03T05:21:55.061Z	2 moderate severity vulnerabilities
+2026-08-03T05:21:55.061Z	
+2026-08-03T05:21:55.062Z	To address all issues, run:
+2026-08-03T05:21:55.062Z	  npm audit fix
+2026-08-03T05:21:55.063Z	
+2026-08-03T05:21:55.063Z	Run `npm audit` for details.
+2026-08-03T05:21:55.332Z	Executing user build command: npm run build
+2026-08-03T05:21:55.774Z	
+2026-08-03T05:21:55.776Z	> build
+2026-08-03T05:21:55.776Z	> vite build
+2026-08-03T05:21:55.776Z	
+2026-08-03T05:21:56.342Z	vite v8.2.0 building client environment for production...
+2026-08-03T05:21:57.120Z	
+transforming...✓ 1828 modules transformed.
+2026-08-03T05:21:57.494Z	rendering chunks...
+2026-08-03T05:21:57.623Z	computing gzip size...
+2026-08-03T05:21:57.634Z	dist/index.html                            0.42 kB │ gzip:   0.29 kB
+2026-08-03T05:21:57.634Z	dist/assets/glo-C7E3EBpb.jpg               9.94 kB
+2026-08-03T05:21:57.635Z	dist/assets/airtel-Ij3Yj58a.jpg           15.05 kB
+2026-08-03T05:21:57.635Z	dist/assets/coo-P1a4FQSA.jpg              21.15 kB
+2026-08-03T05:21:57.635Z	dist/assets/mtn-ac9KAb_g.jpg              24.01 kB
+2026-08-03T05:21:57.636Z	dist/assets/logo_white-BBfmUaw8.png       27.41 kB
+2026-08-03T05:21:57.636Z	dist/assets/avatar-3d-C5zhc2bP.png        34.52 kB
+2026-08-03T05:21:57.639Z	dist/assets/logo-B0Ghd28X.png             43.57 kB
+2026-08-03T05:21:57.639Z	dist/assets/mm-D5z21JH2.jpeg             124.49 kB
+2026-08-03T05:21:57.643Z	dist/assets/ceo-CP08zmDQ.jpg             131.40 kB
+2026-08-03T05:21:57.644Z	dist/assets/hero-emirpay-Br7pXHXM.png  1,176.32 kB
+2026-08-03T05:21:57.646Z	dist/assets/index-D5NEy9GZ.css            92.54 kB │ gzip:  15.59 kB
+2026-08-03T05:21:57.646Z	dist/assets/index-DXYgldxp.js            477.86 kB │ gzip: 142.22 kB
+2026-08-03T05:21:57.646Z	
+2026-08-03T05:21:57.647Z	✓ built in 1.29s
+2026-08-03T05:21:57.696Z	Success: Build command completed
+2026-08-03T05:21:57.834Z	Executing user deploy command: npx wrangler pages deploy dist --project-name emirepay-app
+2026-08-03T05:22:00.525Z	npm warn exec The following package was not found and will be installed: wrangler@4.118.0
+2026-08-03T05:22:17.549Z	
+2026-08-03T05:22:17.550Z	 ⛅️ wrangler 4.118.0
+2026-08-03T05:22:17.550Z	────────────────────
+2026-08-03T05:22:17.989Z	
+2026-08-03T05:22:18.085Z	✘ [ERROR] A request to the Cloudflare API (/accounts/42a8c944501a67887d1de4a2cecc16be/pages/projects/emirepay-app) failed.
+2026-08-03T05:22:18.086Z	
+2026-08-03T05:22:18.086Z	  Authentication error [code: 10000]
+2026-08-03T05:22:18.086Z	
+2026-08-03T05:22:18.086Z	
+2026-08-03T05:22:18.088Z	📎 It looks like you are authenticating Wrangler via a custom API token set in an environment variable.
+2026-08-03T05:22:18.089Z	Please ensure it has the correct permissions for this operation.
+2026-08-03T05:22:18.089Z	
+2026-08-03T05:22:18.093Z	Getting User settings...
+2026-08-03T05:22:18.494Z	👋 You are logged in with an User API Token, associated with the email ubaliiringim@gmail.com.
+2026-08-03T05:22:18.495Z	ℹ️  The API Token is read from the CLOUDFLARE_API_TOKEN environment variable.
+2026-08-03T05:22:18.506Z	┌──────────────────────────────────┬──────────────────────────────────┐
+2026-08-03T05:22:18.507Z	│ Account Name                     │ Account ID                       │
+2026-08-03T05:22:18.508Z	├──────────────────────────────────┼──────────────────────────────────┤
+2026-08-03T05:22:18.509Z	│ Ubaliiringim@gmail.com's Account │ 42a8c944501a67887d1de4a2cecc16be │
+2026-08-03T05:22:18.509Z	└──────────────────────────────────┴──────────────────────────────────┘
+2026-08-03T05:22:18.510Z	🔓 To see token permissions visit https://dash.cloudflare.com/profile/api-tokens
+2026-08-03T05:22:18.629Z	🎢 Membership roles in "Ubaliiringim@gmail.com's Account": Contact account super admin to change your permissions.
+2026-08-03T05:22:18.629Z	- Super Administrator - All Privileges
+2026-08-03T05:22:18.634Z	🪵  Logs were written to "/opt/buildhome/.config/.wrangler/logs/wrangler-2026-08-03_05-22-16_761.log"
+2026-08-03T05:22:18.791Z	Failed: error occurred while running deploy command
