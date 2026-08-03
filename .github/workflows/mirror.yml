@@ -1,0 +1,25 @@
+name: Mirror to Personal Repository
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Personal Repository
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          git remote add personal https://x-access-token:${{ secrets.PERSONAL_REPO_TOKEN }}@github.com/ubaliringim/EmirePay_app.git
+
+          git push personal main --force
