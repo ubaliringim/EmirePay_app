@@ -1,6 +1,6 @@
 # emirepay
 
-A new Flutter project.
+A new Flutter project by Teamstack.
 
 ## Getting Started
 
